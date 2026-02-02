@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRIT Canteen - Menu</title>
+    <style>
+        :root{
+            --bg: linear-gradient(135deg, #e0f7fa 0%, #f0f9ff 50%, #e8f5e9 100%);
+            --page-edge: #e0f7fa;
+            --card: #f0f9ff;
+            --muted: #08202a;
+            --accent: #00bcd4;
+            --accent-2: #00e5c3;
+            --glass: rgba(0,188,212,0.08);
+            --shadow: rgba(2,6,23,0.08);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:Inter,Segoe UI,system-ui,Arial;background:var(--bg);color:var(--muted);min-height:100vh}
+
+        /* Header */
+        header{padding:18px 24px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-bottom:4px solid var(--accent-2);box-shadow:0 6px 20px var(--shadow)}
+        .header-content{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+        .brand{display:flex;align-items:center;gap:14px}
+        .logo{font-size:24px;font-weight:800;color:white}
+        .tagline{font-size:13px;color:rgba(255,255,255,0.9);margin-top:2px}
+        .user-section{display:flex;align-items:center;gap:16px}
+        .user-greeting{color:white;font-weight:600;font-size:14px}
+        .user-avatar{width:40px;height:40px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent)}
+        .btn-logout{background:rgba(255,255,255,0.2);color:white;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;font-weight:600;transition:all 0.2s}
+        .btn-logout:hover{background:rgba(255,255,255,0.3)}
+
+        /* Welcome Banner */
+        .welcome-banner{max-width:1200px;margin:24px auto;padding:0 24px}
+        .welcome-card{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:28px 32px;border-radius:20px;color:white;box-shadow:0 12px 40px rgba(102,126,234,0.3);position:relative;overflow:hidden}
+        .welcome-card::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:rgba(255,255,255,0.1);border-radius:50%}
+        .welcome-card h1{font-size:28px;margin-bottom:8px;position:relative;z-index:1}
+        .welcome-card p{opacity:0.9;font-size:15px;position:relative;z-index:1}
+        .welcome-time{font-size:13px;opacity:0.8;margin-top:12px;position:relative;z-index:1}
+        .order-type-badge{display:inline-block;background:linear-gradient(90deg,#4caf50,#66bb6a);color:white;padding:6px 14px;border-radius:20px;font-weight:700;font-size:13px;margin-top:12px;position:relative;z-index:1}
+
+
+
+        /* Category Tabs */
+        .category-section{max-width:1200px;margin:0 auto;padding:0 24px}
+        .category-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+        .category-tab{padding:10px 20px;border-radius:25px;border:2px solid rgba(0,188,212,0.2);background:white;cursor:pointer;font-weight:600;color:var(--muted);transition:all 0.2s}
+        .category-tab:hover{border-color:var(--accent);color:var(--accent)}
+        .category-tab.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border-color:transparent}
+
+        /* Menu Grid */
+        .menu-container{max-width:1200px;margin:0 auto 100px;padding:0 24px}
+        .menu-category{margin-bottom:32px}
+        .category-title{font-size:22px;color:var(--muted);margin-bottom:16px;padding-bottom:8px;border-bottom:3px solid var(--accent);display:inline-block}
+        .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+        
+        .menu-item{background:linear-gradient(135deg,#ffffff 0%,#f5fbfc 100%);padding:16px;border-radius:16px;border:2px solid rgba(0,188,212,0.08);position:relative;overflow:hidden;transition:all 0.3s ease;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+        .menu-item:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(0,188,212,0.15);border-color:rgba(0,188,212,0.2)}
+        .menu-item-image{width:100%;height:150px;border-radius:12px;object-fit:cover;margin-bottom:12px;background:#f0f0f0}
+        .menu-item h4{color:#03121a;margin:8px 0;font-weight:800;font-size:16px}
+        .menu-item p{color:var(--muted);font-size:13px;line-height:1.4}
+        .menu-item-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+        .price{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:8px 14px;border-radius:10px;font-weight:800;font-size:15px}
+        .add-btn{background:linear-gradient(90deg,#4caf50,#66bb6a);color:white;padding:10px 18px;border-radius:10px;border:none;cursor:pointer;font-weight:700;transition:all 0.2s;box-shadow:0 4px 16px rgba(76,175,80,0.25)}
+        .add-btn:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(76,175,80,0.35)}
+        .add-btn.added{background:linear-gradient(90deg,#2196f3,#42a5f5)}
+
+        /* Special Items */
+        /* All combos available for everyone */
+        .special-badge{position:absolute;top:12px;left:12px;background:linear-gradient(90deg,#ff6b35,#f7931e);color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700}
+
+        /* Floating Cart */
+        .cart-fab{position:fixed;right:24px;bottom:24px;background:linear-gradient(90deg,var(--accent-2),var(--accent));color:white;padding:16px 24px;border-radius:999px;box-shadow:0 16px 40px rgba(0,188,212,0.3);cursor:pointer;display:flex;align-items:center;gap:12px;z-index:80;transition:all 0.3s}
+        .cart-fab:hover{transform:scale(1.05)}
+        .cart-count{background:white;color:var(--accent);padding:6px 12px;border-radius:999px;font-weight:800}
+        .cart-total{font-weight:700;font-size:14px}
+        
+        .cart-modal{position:fixed;right:24px;bottom:90px;width:380px;max-height:65vh;background:linear-gradient(180deg,#ffffff,#f5f5f5);border-radius:16px;padding:20px;border:1px solid rgba(0,188,212,0.15);box-shadow:0 30px 80px rgba(2,6,23,0.2);z-index:90;display:none;overflow:auto}
+        .cart-modal.show{display:block}
+        .cart-modal h3{color:var(--muted);margin-bottom:16px;font-size:18px}
+        .cart-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,188,212,0.1)}
+        .cart-item-info h5{color:var(--muted);font-size:14px;margin-bottom:4px}
+        .cart-item-info span{color:#666;font-size:12px}
+        .cart-item-controls{display:flex;gap:8px;align-items:center}
+        .qty-btn{width:28px;height:28px;border-radius:8px;border:1px solid rgba(0,188,212,0.2);background:white;cursor:pointer;font-weight:700;color:var(--muted)}
+        .qty-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+        .qty-display{font-weight:700;min-width:24px;text-align:center}
+        .remove-btn{background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px}
+        .cart-summary{margin-top:16px;padding-top:16px;border-top:2px solid var(--accent)}
+        .cart-summary-row{display:flex;justify-content:space-between;margin-bottom:8px;color:var(--muted)}
+        .cart-summary-row.total{font-size:18px;font-weight:800;color:var(--accent)}
+        .checkout-btn{width:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:14px;border-radius:12px;border:none;cursor:pointer;font-weight:800;font-size:16px;margin-top:12px;box-shadow:0 8px 24px rgba(0,188,212,0.25)}
+        .checkout-btn:hover{transform:scale(1.02)}
+
+        /* Footer */
+        footer{background:linear-gradient(90deg,#1a3a52,#0d2436);padding:20px;text-align:center;color:white;position:fixed;bottom:0;left:0;right:0}
+        footer p{font-size:13px;opacity:0.8}
+
+        /* Responsive */
+        @media (max-width:768px){
+            .header-content{flex-direction:column;text-align:center}
+            .welcome-card h1{font-size:22px}
+            .cart-modal{right:12px;left:12px;width:auto}
+            .menu-grid{grid-template-columns:1fr}
+        }
+
+        /* Animations */
+        .fade-in{animation:fadeIn 0.5s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo">🍽️ BVRIT CANTEEN</div>
+                <div class="tagline">Fresh • Fast • Friendly</div>
+            </div>
+            <div class="user-section">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-greeting" id="userGreeting">Welcome, User!</div>
+                <button class="btn-logout" id="backToAdminBtn" onclick="goBackToAdmin()" style="display:none;background:linear-gradient(90deg,#9c27b0,#ba68c8);border-color:#9c27b0">⬅️ Back to Admin</button>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Welcome Banner -->
+        <section class="welcome-banner">
+            <div class="welcome-card fade-in">
+                <h1 id="welcomeMessage">👋 Good Morning, User!</h1>
+                <p>Ready to order something delicious? Browse our menu and enjoy your meal!</p>
+                <div class="welcome-time" id="welcomeTime"></div>
+                <div class="order-type-badge" id="orderTypeBadge"></div>
+            </div>
+        </section>
+
+
+
+        <!-- Category Tabs -->
+        <section class="category-section">
+            <div class="category-tabs">
+                <button class="category-tab active" onclick="filterCategory('all')">🍽️ All Items</button>
+                <button class="category-tab" onclick="filterCategory('breakfast')">🌅 Breakfast</button>
+                <button class="category-tab" onclick="filterCategory('meals')">🍛 Meals</button>
+                <button class="category-tab" onclick="filterCategory('veg')">🥬 Veg</button>
+                <button class="category-tab" onclick="filterCategory('nonveg')">🍗 Non-Veg</button>
+                <button class="category-tab" onclick="filterCategory('snacks')">🍟 Snacks</button>
+                <button class="category-tab" onclick="filterCategory('beverages')">☕ Beverages</button>
+                <button class="category-tab" onclick="filterCategory('special')">⭐ Campus Combos</button>
+            </div>
+        </section>
+
+        <!-- Menu Items -->
+        <section class="menu-container">
+            <!-- Breakfast Category -->
+            <div class="menu-category" data-category="breakfast">
+                <h2 class="category-title">🌅 Breakfast (7 AM - 10 AM)</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Idli (4 pcs)" data-price="35">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/idly.jpg" alt="Idli" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Idli (4 pcs)</h4>
+                        <p>Soft steamed Idli with sambar & chutney</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹35</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Plain Dosa" data-price="45">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/dosa.jpg" alt="Plain Dosa" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Plain Dosa</h4>
+                        <p>Crispy rice crepe with sambar & chutney</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹45</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Masala Dosa" data-price="50">
+                        <span class="special-badge">🔥 Popular</span>
+                        <img src="./images/m dosa.jpg" alt="Masala Dosa" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Masala Dosa</h4>
+                        <p>Crispy dosa with spiced potato filling</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹50</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Puri (4 pcs)" data-price="35">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/puri.jpg" alt="Puri" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Puri (4 pcs)</h4>
+                        <p> with potato curry</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹35</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Upma" data-price="30">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/upma.jpg" alt="Upma" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Upma</h4>
+                        <p>tasty and healthy</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Pesarattu" data-price="50">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#ff9800,#ffb74d)">⭐ Special</span>
+                        <img src="./images/peasarattu.jpg" alt="Pesarattu" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Pesarattu</h4>
+                        <p>Green gram dosa </p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹50</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Poha" data-price="30">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/poha.jpg" alt="Poha" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Poha</h4>
+                        <p>Flattened rice with peanuts & onions</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Egg Dosa" data-price="55">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Egg</span>
+                        <img src="./images/egg dosa.jpg" alt="Egg Dosa" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Egg Dosa</h4>
+                        <p>Dosa topped with scrambled egg</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹55</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meals Category -->
+            <div class="menu-category" data-category="meals">
+                <h2 class="category-title">🍛 Lunch & Dinner Meals</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Veg Meals (Full)" data-price="80">
+                        <span class="special-badge">🔥 Popular</span>
+                        <img src="./images/veg meals.jpg" alt="Veg Meals" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Meals (Full)</h4>
+                        <p>Unlimited Rice + Veg Curries + Sambar + Rasam + Curd + Papad</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹100</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Veg Meals (Mini)" data-price="70">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">💰 Budget</span>
+                        <img src="./images/veg meals.jpg" alt="Veg Meals (Mini)" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Meals (Mini)</h4>
+                        <p>Limited Rice + Veg Curry + Sambar + Pickle + curd + papad</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹70</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Curd Rice" data-price="50">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/curd_rice.jpg" alt="Curd Rice" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Curd Rice</h4>
+                        <p>Cool yogurt rice with pickle</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹50</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Sambar Rice" data-price="50">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/sambar_rice.jpg" alt="Sambar Rice" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Sambar Rice</h4>
+                        <p>Rice mixed with sambar & vegetables</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹50</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Lemon Rice" data-price="50">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/lemon_rice.jpg" alt="Lemon Rice" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Lemon Rice</h4>
+                        <p>Tangy lemon flavored rice with peanuts</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹50</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Pulihora" data-price="50">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#ff9800,#ffb74d)">⭐ Andhra</span>
+                        <img src="./images/pulihora.jpg" alt="Pulihora" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Pulihora (Tamarind Rice)</h4>
+                        <p>Traditional tamarind rice</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹50</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chapati (2 pcs)" data-price="20">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/chapatis.jpg" alt="Chapati" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chapati (2 pcs)</h4>
+                        <p>Soft chapatis</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹20</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Roti with Dal" data-price="55">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/roti.jpg" alt="Roti Dal" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Roti with Dal</h4>
+                        <p>2 Rotis with dal fry</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹55</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chicken Meals (Full)" data-price="130">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🍗 Popular</span>
+                        <img src="./images/chicken_meals.avif" alt="Chicken Meals" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken Meals (Full)</h4>
+                        <p>Unlimited Rice + Chicken Curry + Curd + Papad</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹130</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chicken Meals (Mini)" data-price="105">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Non-Veg</span>
+                        <img src="./images/chicken_meals.avif" alt="Chicken Mini" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken Meals (Mini)</h4>
+                        <p>limited Rice + Chicken Curry + Pickle</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹105</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chicken + Chapati" data-price="100">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🍗 Non-Veg</span>
+                        <img src="./images/chicken_chapati.jpg" alt="Chicken Chapati" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken + Chapati (2 pcs)</h4>
+                        <p>2 Chapatis with spicy chicken curry</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹100</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Veg Items -->
+            <div class="menu-category" data-category="veg">
+                <h2 class="category-title">🥬 Vegetarian Dishes</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Veg Biryani" data-price="100">
+                        <span class="special-badge">🔥 Popular</span>
+                        <img src="./images/veg_biryani.jpg" alt="Veg Biryani" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Biryani</h4>
+                        <p>Fragrant rice with mixed vegetables & spices</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹100</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Veg Fried Rice" data-price="60">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/veg.jpg" alt="Veg Fried Rice" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Fried Rice</h4>
+                        <p>Stir-fried rice with vegetables</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹60</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Veg Noodles" data-price="60">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/veg_noodles.jpg" alt="Veg Noodles" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Noodles</h4>
+                        <p>Hakka noodles with vegetables</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹60</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Veg Manchuria" data-price="60">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/360_F_324567329_VIPsg4s4kWkvqJviANcIgeYPG602kN56.jpg" alt="Veg Manchuria" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Manchuria (Dry)</h4>
+                        <p>Crispy vegetable balls in sauce</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹60</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Paneer Curry" data-price="80">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/paneer-curry-recipe.jpg" alt="Paneer Curry" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Paneer Curry</h4>
+                        <p>Cottage cheese in spicy gravy</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹80</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Gobi Manchuria" data-price="70">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/gobi-manchurian-cauliflower-manchurian.jpg" alt="Gobi Manchuria" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Gobi Manchuria</h4>
+                        <p>Crispy cauliflower in spicy sauce</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹70</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Non-Veg Items -->
+            <div class="menu-category" data-category="nonveg">
+                <h2 class="category-title">🍗 Non-Vegetarian</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Chicken Biryani" data-price="140">
+                        <span class="special-badge">🔥 Best Seller</span>
+                        <img src="./images/Chicken-Biryani-Featured.jpg" alt="Chicken Biryani" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken Biryani</h4>
+                        <p>Hyderabadi style dum biryani with raita</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹140</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Egg Biryani" data-price="90">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Egg</span>
+                        <img src="./images/Egg-Biryani-Featured-1.jpg" alt="Egg Biryani" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Egg Biryani</h4>
+                        <p>Flavorful rice with boiled eggs</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹90</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chicken Fried Rice" data-price="80">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🍗 Non-Veg</span>
+                        <img src="./images/Shutterstock_1043177881.jpg" alt="Chicken Fried Rice" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken Fried Rice</h4>
+                        <p>Stir-fried rice with chicken pieces</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹80</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Egg Fried Rice" data-price="70">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Egg</span>
+                        <img src="./images/Egg-fried-rice-2.jpg" alt="Egg Fried Rice" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Egg Fried Rice</h4>
+                        <p>Fried rice with scrambled eggs</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹80</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chicken Noodles" data-price="80">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🍗 Non-Veg</span>
+                        <img src="./images/1200-by-1200-images-5.jpg" alt="Chicken Noodles" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken Noodles</h4>
+                        <p>Hakka noodles with chicken</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹80</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Egg Curry + Rice" data-price="60">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Egg</span>
+                        <img src="./images/3zakbb4caird1.jpeg" alt="Egg Curry" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Egg Curry + Rice</h4>
+                        <p>Boiled eggs in spicy gravy with rice</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹60</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Chicken 65" data-price="100">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🌶️ Spicy</span>
+                        <img src="./images/Chicken-65-Spicy-Crispy-3.jpg" alt="Chicken 65" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Chicken 65</h4>
+                        <p>Crispy spicy fried chicken - Andhra style</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹100</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Omelette" data-price="20">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Egg</span>
+                        <img src="./images/SAM4952-1.jpg" alt="Omelette" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Egg Omelette</h4>
+                        <p>Fluffy omelette with onions & chilies</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹20</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Snacks Category -->
+            <div class="menu-category" data-category="snacks">
+                <h2 class="category-title">🍟 Snacks & Fast Food</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Samosa (2 pcs)" data-price="20">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/61050397.avif" alt="Samosa" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Samosa (2 pcs)</h4>
+                        <p>Crispy pastry with spiced potato filling</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹20</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Veg Puff (2 pcs)" data-price="30">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Veg</span>
+                        <img src="./images/CopyofLSD07524.webp" alt="Puff" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Veg Puff (2 pcs)</h4>
+                        <p>Flaky puff pastry with veg filling</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Egg Puff (2 pcs)" data-price="35">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#e53935,#ef5350)">🥚 Egg</span>
+                        <img src="./images/Kerala-Egg-Puffs.webp" alt="Egg Puff" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Egg Puff (2 pcs)</h4>
+                        <p>Puff pastry with egg filling</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹35</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Mirchi Bajji (4 pcs)" data-price="30">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#ff9800,#ffb74d)">⭐ Andhra</span>
+                        <img src="./images/Mirapakaya-Bajji-2.jpg" alt="Mirchi Bajji" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Mirchi Bajji (4 pcs)</h4>
+                        <p>Stuffed chili fritters - local favorite</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Punugulu (6 pcs)" data-price="20">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#ff9800,#ffb74d)">⭐ Andhra</span>
+                        <img src="./images/15706112943_9e29e241d8_z.jpg" alt="Punugulu" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Punugulu (6 pcs)</h4>
+                        <p>Crispy rice flour dumplings with chutney</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹20</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Maggi Noodles" data-price="40">
+                        <span class="special-badge">🔥 Popular</span>
+                        <img src="./images/hq720.jpg" alt="Maggi" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Maggi Noodles</h4>
+                        <p>Hot masala maggi with vegetables</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹40</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Beverages Category -->
+            <div class="menu-category" data-category="beverages">
+                <h2 class="category-title">☕ Beverages & Drinks</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Tea" data-price="15">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">💰 Budget</span>
+                        <img src="./images/ginger-tea-recipe-3.webp" alt="Tea" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Tea</h4>
+                        <p>Hot masala chai</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹15</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Coffee" data-price="25">
+                        <span class="special-badge">🔥 Popular</span>
+                        <img src="./images/tips-to-recognize-good-quality-coffee-424970.webp"alt="Coffee" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Coffee</h4>
+                        <p>Traditional filter coffee</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹25</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Thumps Up" data-price="30">
+                        <span class="special-badge">🔥 Popular</span>
+                        <img src="./images/thums-up-250.webp" alt="Thumps Up" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Thumps Up</h4>
+                        <p>Energizing cola drink - 400ml</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Mountain Dew" data-price="30">
+                        <img src="./images/mountain-dew-2lt-1702624298919_SKU-1666_0.webp" alt="Mountain Dew" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Mountain Dew</h4>
+                        <p>Citrus soda with intense flavor - 400ml</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Pulpy" data-price="30">
+                        <img src="./images/61D+jP7XKBL.jpg" alt="Pulpy" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Pulpy</h4>
+                        <p>Fruit juice with pulp - 400ml</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Maaza" data-price="30">
+                        <img src="./images/maaza.jpg" alt="Maaza" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Maaza</h4>
+                        <p>Mango fruit juice - 400ml</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="nimboza" data-price="30">
+                        <img src="./images/265893_8-7-up-nimbooz-soft-drink-with-real-lemon-juice.webp" alt="Nimboza" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Nimboz</h4>
+                        <p>Citrus flavored drink - 400ml</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹30</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Badam Milk" data-price="45">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">🥬 Healthy</span>
+                        <img src="./images/1276fff5-c071-45c2-88a5-fc5f0f05f2a4-SKU017161.webp" alt="Badam Milk" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Badam Milk</h4>
+                        <p>Nutritious almond milk drink</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹45</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campus Special Combos -->
+            <div class="menu-category" data-category="special">
+                <h2 class="category-title">⭐ BVRIT Campus Combos</h2>
+                <div class="menu-grid">
+                    <div class="menu-item fade-in" data-name="Student Budget Combo" data-price="65">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#4caf50,#66bb6a)">💰 Student</span>
+                        <img src="./images/meals.webp" alt="Student Combo" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Student Budget Combo</h4>
+                        <p>Mini Meals + Buttermilk + Pickle</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹65</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Hostel Special" data-price="85">
+                        <span class="special-badge">🔥 Hostel Fav</span>
+                        <img src="./images/meals.webp"alt="Hostel Special" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Hostel Special</h4>
+                        <p>Full Meals + Tea/Coffee + Sweet</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹85</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Evening Snack Combo" data-price="40">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#ff9800,#ffb74d)">🌆 Evening</span>
+                        <img src="./images/tea__samosa_1_zmes2HK.png" alt="Snack Combo" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Evening Snack Combo</h4>
+                        <p>Samosa/Puff + Tea</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹40</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                    <div class="menu-item fade-in" data-name="Night Study Combo" data-price="60">
+                        <span class="special-badge" style="background:linear-gradient(90deg,#9c27b0,#ba68c8)">🌙 Night</span>
+                        <img src="./images/hq720.jpg" alt="Night Study" class="menu-item-image" onerror="this.style.background='linear-gradient(135deg,#f0f0f0,#e0e0e0)'">
+                        <h4>Night Study Combo</h4>
+                        <p>Maggi + Coffee + Biscuits</p>
+                        <div class="menu-item-footer">
+                            <div class="price">₹60</div>
+                            <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Floating Cart -->
+        <div class="cart-fab" onclick="toggleCart()">
+            <span>🛒</span>
+            <span class="cart-total" id="cartTotalFab">₹0</span>
+            <span class="cart-count" id="cartCount">0</span>
+        </div>
+
+        <!-- Cart Modal -->
+        <div class="cart-modal" id="cartModal">
+            <h3>🛒 Your Cart</h3>
+            <div id="cartItems">
+                <p style="color:#666;text-align:center;padding:20px">Your cart is empty</p>
+            </div>
+            <div class="cart-summary" id="cartSummary" style="display:none">
+                <div class="cart-summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="cart-summary-row">
+                    <span>Discount</span>
+                    <span id="discount" style="color:#4caf50">-₹0</span>
+                </div>
+                <div class="cart-summary-row total">
+                    <span>Total</span>
+                    <span id="grandTotal">₹0</span>
+                </div>
+                <button class="checkout-btn" onclick="checkout(); event.stopPropagation();">Place Order 🍽️</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>� BVRIT Narsapur Campus, West Godavari, Andhra Pradesh | 📞 Canteen: Ext. 234 | ⏰ Open: 7:00 AM - 9:00 PM</p>
+    </footer>
+
+    <script>
+        // Check if user is logged in with valid credentials
+        const currentUser = localStorage.getItem('bvrit_current_user');
+        const registeredUsers = JSON.parse(localStorage.getItem('bvrit_users') || '{}');
+        const isAdmin = localStorage.getItem('bvrit_is_admin') === 'true';
+        
+        // Redirect to login if no user session OR user doesn't exist in database (except for admin)
+        if(!currentUser || (!registeredUsers[currentUser] && !isAdmin)){
+            localStorage.removeItem('bvrit_current_user'); // Clear invalid session
+            alert('Please login to access the menu.');
+            window.location.href = 'index.html';
+        }
+
+        // Initialize user greeting
+        function initUserGreeting(){
+            const username = currentUser || 'User';
+            const hour = new Date().getHours();
+            let greeting = 'Good Morning';
+            if(hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+            else if(hour >= 17) greeting = 'Good Evening';
+            
+            document.getElementById('welcomeMessage').textContent = `👋 ${greeting}, ${username}!`;
+            document.getElementById('userGreeting').textContent = `Welcome, ${username}!`;
+            document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+            
+            const now = new Date();
+            document.getElementById('welcomeTime').textContent = `📅 ${now.toLocaleDateString('en-IN', {weekday:'long', year:'numeric', month:'long', day:'numeric'})} | ⏰ ${now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'})}`;
+            
+            // Display order type
+            displayOrderType();
+        }
+
+        // Display order type
+        function displayOrderType(){
+            const orderType = localStorage.getItem('bvrit_order_type');
+            const badge = document.getElementById('orderTypeBadge');
+            
+            if(orderType === 'takeaway'){
+                badge.innerHTML = '🛍️ Takeaway Order';
+                badge.style.background = 'linear-gradient(90deg,#ff9800,#ffb74d)';
+            } else if(orderType === 'eatin'){
+                badge.innerHTML = '🍽️ Eat In Order';
+                badge.style.background = 'linear-gradient(90deg,#9c27b0,#ba68c8)';
+            }
+        }
+
+        // Load menu items from admin localStorage
+        function loadMenuItemsFromAdmin(){
+            const adminItems = JSON.parse(localStorage.getItem('bvrit_menu_items') || 'null');
+            if(!adminItems) return; // Use default items if admin hasn't set any
+
+            // Update prices and availability based on admin changes
+            adminItems.forEach(adminItem => {
+                const menuItems = document.querySelectorAll('[data-name="' + adminItem.name + '"]');
+                menuItems.forEach(menuItem => {
+                    // Update price
+                    const priceElement = menuItem.querySelector('.price');
+                    if(priceElement){
+                        priceElement.textContent = `₹${adminItem.price}`;
+                    }
+                    // Update data attribute for cart
+                    menuItem.dataset.price = adminItem.price;
+
+                    // Hide/show item based on availability
+                    if(!adminItem.available){
+                        menuItem.style.opacity = '0.5';
+                        menuItem.style.pointerEvents = 'none';
+                        const button = menuItem.querySelector('.add-btn');
+                        if(button) button.textContent = '❌ Not Available';
+                    }
+                });
+            });
+        }
+
+
+
+        // Category Filter
+        function filterCategory(category){
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.menu-category').forEach(cat => {
+                if(category === 'all'){
+                    cat.style.display = 'block';
+                } else {
+                    cat.style.display = cat.dataset.category === category ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Cart functionality
+        let cart = JSON.parse(localStorage.getItem('bvrit_cart') || '{}');
+        
+        function addToCart(btn){
+            event.stopPropagation(); // Prevent cart from closing
+            const item = btn.closest('.menu-item');
+            const name = item.dataset.name;
+            const price = parseInt(item.dataset.price);
+            const key = name.replace(/\s+/g, '_').toLowerCase();
+            
+            if(!cart[key]){
+                cart[key] = { name, price, qty: 0 };
+            }
+            cart[key].qty++;
+            
+            btn.textContent = '✓ Added';
+            btn.classList.add('added');
+            setTimeout(() => {
+                btn.textContent = 'Add +';
+                btn.classList.remove('added');
+            }, 800);
+            
+            updateCartUI();
+        }
+
+        function updateCartUI(){
+            const count = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.price * item.qty), 0);
+            
+            // Save cart to localStorage
+            localStorage.setItem('bvrit_cart', JSON.stringify(cart));
+            
+            document.getElementById('cartCount').textContent = count;
+            document.getElementById('cartTotalFab').textContent = `₹${total}`;
+            
+            const itemsContainer = document.getElementById('cartItems');
+            const summaryContainer = document.getElementById('cartSummary');
+            
+            if(count === 0){
+                itemsContainer.innerHTML = '<p style="color:#666;text-align:center;padding:20px">Your cart is empty</p>';
+                summaryContainer.style.display = 'none';
+            } else {
+                let html = '';
+                for(const key in cart){
+                    const item = cart[key];
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <h5>${item.name}</h5>
+                                <span>₹${item.price} each</span>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="qty-btn" onclick="changeQty('${key}', -1); event.stopPropagation();">-</button>
+                                <span class="qty-display">${item.qty}</span>
+                                <button class="qty-btn" onclick="changeQty('${key}', 1); event.stopPropagation();">+</button>
+                                <button class="remove-btn" onclick="removeItem('${key}'); event.stopPropagation();">✕</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                itemsContainer.innerHTML = html;
+                summaryContainer.style.display = 'block';
+                
+                document.getElementById('subtotal').textContent = `₹${total}`;
+                document.getElementById('discount').textContent = `-₹0`;
+                document.getElementById('grandTotal').textContent = `₹${total}`;
+            }
+        }
+
+        function changeQty(key, delta){
+            if(!cart[key]) return;
+            cart[key].qty += delta;
+            if(cart[key].qty <= 0) delete cart[key];
+            updateCartUI();
+        }
+
+        function removeItem(key){
+            delete cart[key];
+            updateCartUI();
+        }
+
+        function toggleCart(){
+            document.getElementById('cartModal').classList.toggle('show');
+        }
+
+        // Close cart when clicking outside
+        document.addEventListener('click', function(event){
+            const cartModal = document.getElementById('cartModal');
+            const cartFab = document.querySelector('.cart-fab');
+            
+            // If cart is open and click is outside both cart and button, close it
+            if(cartModal.classList.contains('show') && 
+               !cartModal.contains(event.target) && 
+               !cartFab.contains(event.target)){
+                cartModal.classList.remove('show');
+            }
+        });
+
+        function checkout(){
+            const count = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+            if(count === 0){
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            // Save cart to localStorage and redirect to checkout page
+            localStorage.setItem('bvrit_cart', JSON.stringify(cart));
+            window.location.href = 'checkout.html';
+        }
+
+        function logout(){
+            localStorage.removeItem('bvrit_current_user');
+            window.location.href = 'index.html';
+        }
+
+        // Go back to admin page
+        function goBackToAdmin(){
+            window.location.href = 'admin.html';
+        }
+
+        // Show back to admin button if admin is logged in
+        function showAdminButton(){
+            if(isAdmin){
+                document.getElementById('backToAdminBtn').style.display = 'block';
+            }
+        }
+
+        // Initialize
+        initUserGreeting();
+        loadMenuItemsFromAdmin(); // Load any admin changes
+        updateCartUI(); // This will load and display any previously saved items from localStorage
+        showAdminButton(); // Show admin button if admin is viewing
+    </script>
+</body>
+</html>
