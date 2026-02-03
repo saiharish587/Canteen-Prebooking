@@ -64,31 +64,11 @@
                     <div style="text-align:center;margin-bottom:16px">
                         <div id="qrCode" style="display:none;background:white;padding:20px;border-radius:12px;width:fit-content;margin:0 auto">
                             <p style="color:var(--muted);font-size:12px;margin-bottom:8px">Scan with your UPI app:</p>
-                            <svg width="200" height="200" viewBox="0 0 200 200" style="border:1px solid #ccc;border-radius:8px">
-                                <!-- QR Code Pattern -->
-                                <rect width="200" height="200" fill="white"/>
-                                <!-- Timing patterns and data -->
-                                <rect x="0" y="0" width="50" height="50" fill="black"/>
-                                <rect x="10" y="10" width="30" height="30" fill="white"/>
-                                <rect x="15" y="15" width="20" height="20" fill="black"/>
-                                <rect x="140" y="0" width="50" height="50" fill="black"/>
-                                <rect x="150" y="10" width="30" height="30" fill="white"/>
-                                <rect x="155" y="15" width="20" height="20" fill="black"/>
-                                <rect x="0" y="140" width="50" height="50" fill="black"/>
-                                <rect x="10" y="150" width="30" height="30" fill="white"/>
-                                <rect x="15" y="155" width="20" height="20" fill="black"/>
-                                <!-- Random data pattern -->
-                                <rect x="60" y="60" width="80" height="80" fill="white"/>
-                                <rect x="70" y="70" width="10" height="10" fill="black"/>
-                                <rect x="90" y="75" width="15" height="15" fill="black"/>
-                                <rect x="110" y="70" width="10" height="10" fill="black"/>
-                                <rect x="75" y="95" width="10" height="10" fill="black"/>
-                                <rect x="100" y="105" width="15" height="15" fill="black"/>
-                                <rect x="115" y="95" width="10" height="10" fill="black"/>
-                                <rect x="70" y="120" width="10" height="10" fill="black"/>
-                                <rect x="90" y="115" width="10" height="10" fill="black"/>
-                                <rect x="110" y="120" width="10" height="10" fill="black"/>
-                            </svg>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=bvritcanteen@upi%26pn=BVRIT%20Canteen%26cu=INR" 
+                                 alt="UPI QR Code" 
+                                 width="200" 
+                                 height="200" 
+                                 style="border-radius:8px;border:1px solid #ccc;">
                             <p style="color:var(--accent);font-weight:700;margin-top:12px;font-size:14px">UPI: bvritcanteen@upi</p>
                         </div>
                     </div>

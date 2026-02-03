@@ -133,21 +133,21 @@ function processPaymentTransaction(){
         
         // Populate order details
         const detailsHTML = `
-            <div class="detail-row">
-                <span class="detail-label">Order ID:</span>
-                <span class="detail-value">${orderNumber}</span>
+            <div class="detail-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                <span class="detail-label" style="color:#aaa;">Order ID:</span>
+                <span class="detail-value" style="color:#87CEEB;font-weight:600;">${orderNumber}</span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Total Amount:</span>
-                <span class="detail-value">${total}</span>
+            <div class="detail-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                <span class="detail-label" style="color:#aaa;">Total Amount:</span>
+                <span class="detail-value" style="color:#87CEEB;font-weight:600;">${total}</span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Preparation Time:</span>
-                <span class="detail-value">10-15 minutes ⏱️</span>
+            <div class="detail-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1);">
+                <span class="detail-label" style="color:#aaa;">Preparation Time:</span>
+                <span class="detail-value" style="color:#87CEEB;font-weight:600;">10-15 minutes ⏱️</span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Status:</span>
-                <span class="detail-value">Being Prepared 👨‍🍳</span>
+            <div class="detail-row" style="display:flex;justify-content:space-between;padding:8px 0;">
+                <span class="detail-label" style="color:#aaa;">Status:</span>
+                <span class="detail-value" style="color:#87CEEB;font-weight:600;">Being Prepared 👨‍🍳</span>
             </div>
         `;
         
