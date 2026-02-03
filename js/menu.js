@@ -199,6 +199,8 @@ function checkout(){
 
 function logout(){
     localStorage.removeItem('bvrit_current_user');
+    localStorage.removeItem('bvrit_admin_viewing_menu'); // Clear admin viewing flag on logout
+    localStorage.removeItem('bvrit_is_admin'); // Clear admin status
     window.location.href = 'index.html';
 }
 
