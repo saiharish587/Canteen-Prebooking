@@ -161,8 +161,9 @@ function processPaymentTransaction(){
         
         document.getElementById('greetingMessage').innerHTML = greetingHTML;
         
-        // Show success modal
-        document.getElementById('successModal').classList.add('show');
+        // Show success modal using Bootstrap
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
         
         // Hide checkout content
         document.querySelector('main').style.display = 'none';

@@ -138,37 +138,81 @@
     </footer>
 
     <!-- Success Modal -->
-    <div class="success-modal" id="successModal">
-        <div class="success-card">
-            <div class="success-icon">🎉</div>
-            <h1 class="success-title">Order Confirmed!</h1>
-            <p class="success-subtitle">Your order has been successfully placed</p>
-            
-            <div class="order-details" id="successDetails">
-                <!-- Details will be inserted here by JavaScript -->
-            </div>
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-body text-center p-4 p-md-5" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+                    <!-- Success Animation -->
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 100px; height: 100px; background: linear-gradient(135deg, #00d4aa, #00bcd4); animation: pulse 2s infinite;">
+                            <span style="font-size: 50px;">🎉</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h2 class="fw-bold mb-2" style="color: #00d4aa; font-size: 2rem;">Order Confirmed!</h2>
+                    <p class="text-white-50 mb-4">Your order has been successfully placed</p>
+                    
+                    <!-- Order Details Card -->
+                    <div class="card mb-4 border-0" style="background: rgba(255,255,255,0.1); border-radius: 15px;">
+                        <div class="card-body p-3" id="successDetails">
+                            <!-- Details will be inserted here by JavaScript -->
+                        </div>
+                    </div>
 
-            <div class="greeting-message" id="greetingMessage">
-                <!-- Greeting will be inserted here -->
-            </div>
+                    <!-- Greeting Message -->
+                    <div class="mb-4" id="greetingMessage" style="color: #fff;">
+                        <!-- Greeting will be inserted here -->
+                    </div>
 
-            <div class="pickup-instruction">
-                📋 <strong>Pick up your order at the Canteen Counter</strong><br>
-                Show your Order ID to collect your meal
-            </div>
+                    <!-- Pickup Instruction -->
+                    <div class="alert mb-4" style="background: linear-gradient(90deg, #ff9800, #ffb74d); border: none; border-radius: 12px; color: #000;">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <span class="me-2" style="font-size: 24px;">📋</span>
+                            <div class="text-start">
+                                <strong>Pick up your order at the Canteen Counter</strong><br>
+                                <small>Show your Order ID to collect your meal</small>
+                            </div>
+                        </div>
+                    </div>
 
-            <p style="color:var(--muted);font-size:14px;margin:20px 0">
-                Your delicious meal is now being prepared in our kitchen!<br>
-                <strong>Expected preparation time: 10-15 minutes ⏱️</strong>
-            </p>
+                    <!-- Prep Time Info -->
+                    <div class="mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.05);">
+                        <p class="mb-0 text-white-50">
+                            Your delicious meal is now being prepared in our kitchen!<br>
+                            <span class="badge mt-2" style="background: linear-gradient(90deg, #00bcd4, #00d4aa); font-size: 14px; padding: 8px 16px;">
+                                ⏱️ Expected preparation time: 10-15 minutes
+                            </span>
+                        </p>
+                    </div>
 
-            <button class="logout-btn" onclick="logoutUser()">🚪 Logout & Go to Home</button>
+                    <!-- Logout Button -->
+                    <button class="btn btn-lg w-100 mb-3" onclick="logoutUser()" style="background: linear-gradient(90deg, #e53935, #ef5350); color: white; border: none; border-radius: 12px; padding: 14px; font-weight: 600;">
+                        🚪 Logout & Go to Home
+                    </button>
 
-            <div class="countdown">
-                Redirecting to home in <span class="countdown-number" id="countdownNumber">15</span> seconds...
+                    <!-- Countdown -->
+                    <div class="text-white-50">
+                        Redirecting to home in <span class="badge bg-secondary" id="countdownNumber" style="font-size: 14px;">15</span> seconds...
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        #successModal .modal-content {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 
     <script src="js/checkout.js"></script>
     <!-- Bootstrap JS -->
