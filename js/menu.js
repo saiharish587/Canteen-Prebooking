@@ -204,12 +204,15 @@ function logout(){
 
 // Go back to admin page
 function goBackToAdmin(){
+    // Clear the admin viewing flag when going back
+    localStorage.removeItem('bvrit_admin_viewing_menu');
     window.location.href = 'admin.html';
 }
 
-// Show back to admin button if admin is logged in
+// Show back to admin button only if admin accessed menu from admin panel
 function showAdminButton(){
-    if(isAdmin){
+    const adminViewingMenu = localStorage.getItem('bvrit_admin_viewing_menu') === 'true';
+    if(isAdmin && adminViewingMenu){
         document.getElementById('backToAdminBtn').style.display = 'block';
     }
 }

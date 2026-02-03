@@ -266,6 +266,8 @@ function addNewItem(event){
 function viewMenu(){
     // Save current changes before viewing
     saveMenuItems();
+    // Set flag to show back to admin button in menu page
+    localStorage.setItem('bvrit_admin_viewing_menu', 'true');
     // Open menu in new tab so admin can check changes
     window.open('menu.html', '_blank');
 }
