@@ -285,10 +285,39 @@ function handleSignup(e){
             return;
         }
     }
-    users[username] = { password: pwd, email: email };
+    
+    // Check canteen operating hours (7am to 8:30pm)
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const isClosedHours = currentHour < 7 || currentHour > 20 || (currentHour === 20 && currentMinute >= 30);
+    
+    // Store user credentials (registration allowed anytime)
+    users[username] = { password: pwd, email: email, registeredDuringClosedHours: isClosedHours };
     localStorage.setItem('bvrit_users', JSON.stringify(users));
-    const s=document.getElementById('signupSuccess'); s.textContent='Account created successfully!'; s.classList.add('show');
-    // auto-login after signup and redirect to order-type
+    
+    const s = document.getElementById('signupSuccess');
+    
+    if(isClosedHours){
+        // Registration successful but don't allow login during closed hours
+        s.textContent = '✅ Account created! However, the canteen is closed (7:00 AM - 8:30 PM). Please login during operating hours to place orders.';
+        s.style.background = '#ff9800';
+        s.style.color = 'white';
+        s.classList.add('show');
+        // Close signup modal after showing message and don't redirect
+        setTimeout(()=>{ 
+            closeSignupModal();
+            s.style.background = '';
+            s.style.color = '';
+        }, 5000);
+        return;
+    }
+    
+    // During open hours - normal flow: auto-login and redirect
+    s.textContent = 'Account created successfully!';
+    s.style.background = '';
+    s.style.color = '';
+    s.classList.add('show');
     currentUsername = username;
     localStorage.setItem('bvrit_current_user', username);
     setTimeout(()=>{ window.location.href = 'order-type.html'; },500);
