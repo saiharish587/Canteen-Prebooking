@@ -1,0 +1,31 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /canteen-api/
+    
+    # Handle requests to existing files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Redirect to index.php
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+# Allow all
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# For older Apache versions without mod_authz_core
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>
+
+# Set proper content types
+<IfModule mod_mime.c>
+    AddType application/json .json
+    AddType application/xml .xml
+</IfModule>
+
+
+
