@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRIT Canteen - Order</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+       
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo">🍽️ BVRIT CANTEEN</div>
+                <div class="tagline">Fresh • Fast • Friendly</div>
+            </div>
+            <div class="auth-controls">
+                <button class="btn-login-small" onclick="openLoginModal()">Login</button>
+                <button class="btn-signup" onclick="openSignupModal()">Sign Up</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-card fade-in">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                    <span style="font-size:28px">👨‍🍳</span>
+                    <h2 style="margin:0;color:var(--accent);font-size:42px;font-weight:900;letter-spacing:-0.5px">Crave. Order. Enjoy!</h2>
+                </div>
+                <p style="color:var(--muted);line-height:1.6;margin:16px 0;font-size:15px">📍 <strong>Campus Canteen</strong> — Order fresh meals ahead, skip the queues, and enjoy made-to-order food. Quick prep time, quality ingredients, and great taste guaranteed!</p>
+                <div class="cta-row" style="margin-top:24px">
+                    <button class="btn-cta" onclick="handleOrderNow()" style="background:linear-gradient(135deg,#00bcd4 0%,#00e5c3 50%,#00d4aa 100%);padding:14px 28px;font-size:16px;border-radius:14px;box-shadow:0 12px 40px rgba(0,188,212,0.25);transition:all 0.3s ease">🎉 Start Ordering Now</button>
+                    <button class="btn-secondary" onclick="openLoginModal()" style="padding:12px 20px;font-size:14px">Login</button>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:20px;font-size:13px;color:var(--muted)">
+                    <div>✅ <strong>Live Orders</strong></div>
+                    <div>⏱️ <strong>10-12 mins avg</strong></div>
+                    <div>💯 <strong>100% Fresh</strong></div>
+                </div>
+            </div>
+            <div class="hero-promo fade-in">
+                <div class="highlights-section">
+                    <h3 style="color:var(--accent);font-size:20px;font-weight:800;margin-bottom:16px;text-align:center">Why Order From BVRIT Canteen?</h3>
+                    <div class="highlights-grid">
+                        <div class="highlight-card">
+                            <div class="highlight-icon">⚡</div>
+                            <div class="highlight-title">Super Fast</div>
+                            <div class="highlight-desc">Average 10-12 mins prep</div>
+                        </div>
+                        <div class="highlight-card">
+                            <div class="highlight-icon">✅</div>
+                            <div class="highlight-title">Pre-Order</div>
+                            <div class="highlight-desc">Avoid waiting in lines</div>
+                        </div>
+                        <div class="highlight-card">
+                            <div class="highlight-icon">🍔</div>
+                            <div class="highlight-title">Fresh Food</div>
+                            <div class="highlight-desc">Quality ingredients daily</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="promo-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">1000+</span>
+                        <span class="stat-label">Happy Customers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">20+</span>
+                        <span class="stat-label">Menu Items</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">10 min</span>
+                        <span class="stat-label">Avg. Prep Time</span>
+                    </div>
+                </div>
+                <div class="promo-hours" id="canteenStatus">
+                    <span>⏰</span> Operating Hours: 7:00 AM - 8:30 PM
+                </div>
+            </div>
+        </section>
+
+            <!-- Closed Message Modal -->
+            <div class="login-modal" id="closedModal">
+                <div class="modal-content" style="text-align:center;border:3px solid #dc2626;background:linear-gradient(180deg,#ffffff,#ffebee)">
+                    <button class="modal-close" onclick="closeClosedModal()">✕</button>
+                    <div style="font-size:48px;margin-bottom:16px">🚫</div>
+                    <div style="color:#dc2626;font-size:24px;font-weight:900;margin-bottom:12px">Ordering System Closed</div>
+                    <p style="color:#1a1a1a;font-size:18px;font-weight:600;line-height:1.6;margin-bottom:16px">
+                        The ordering system is currently closed.
+                    </p>
+                    <p style="color:#666;font-size:15px;line-height:1.6;margin-bottom:20px">
+                        <strong>Operating Hours:</strong><br>
+                        7:00 AM - 8:30 PM<br>
+                        <span style="font-size:13px;opacity:0.8">Please try again during these hours</span>
+                    </p>
+                    <button class="btn-cta" onclick="closeClosedModal()" style="background:linear-gradient(90deg,#dc2626,#c62828);width:100%">Close</button>
+                </div>
+            </div>
+
+            <!-- Login Modal -->
+            <div class="login-modal" id="loginModal">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeLoginModal()">✕</button>
+                    <div class="modal-title">Login</div>
+                    <div class="success-message" id="loginSuccess"></div>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="userUsername">Username</label>
+                            <input id="userUsername" type="text" placeholder="Enter your username">
+                            <div class="helper">Username: 3–20 characters (or admin email)</div>
+                            <div class="error-message" id="usernameError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPassword">Password</label>
+                            <input id="userPassword" type="password" maxlength="10" placeholder="max 10 chars">
+                            <div class="helper">Password: 1–10 characters</div>
+                            <div class="error-message" id="passwordError"></div>
+                        </div>
+                        <button type="submit" class="btn-cta" style="width:100%">Login</button>
+                    </form>
+                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,188,212,0.2);text-align:center">
+                        <p style="color:var(--muted);font-size:13px;margin:0">Don't have an account? <a href="#" onclick="switchToSignup();return false" style="color:var(--accent);text-decoration:none;font-weight:700;cursor:pointer">Sign Up here</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup Modal -->
+            <div class="login-modal" id="signupModal">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeSignupModal()">✕</button>
+                    <div class="modal-title">Sign Up</div>
+                    <div class="success-message" id="signupSuccess"></div>
+                    <form onsubmit="handleSignup(event)">
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input id="signupUsername" type="text" placeholder="Choose a username">
+                            <div class="helper">Username: 3–20 characters</div>
+                            <div class="error-message" id="signupUsernameError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">College Email</label>
+                            <input id="signupEmail" type="email" placeholder="e.g., 20A12@bvrit.ac.in">
+                            <div class="helper">Must end with <strong>@bvrit.ac.in</strong></div>
+                            <div class="error-message" id="signupEmailError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input id="signupPassword" type="password" maxlength="10" placeholder="1–10 chars">
+                            <div class="helper">Password: 1–10 characters</div>
+                            <div class="error-message" id="signupPasswordError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupConfirmPassword">Confirm Password</label>
+                            <input id="signupConfirmPassword" type="password" maxlength="10" placeholder="Re-enter password">
+                            <div class="helper">Must match password</div>
+                            <div class="error-message" id="signupConfirmPasswordError"></div>
+                        </div>
+                        <button type="submit" class="btn-cta" style="width:100%">Create Account</button>
+                    </form>
+                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,188,212,0.2);text-align:center">
+                        <p style="color:var(--muted);font-size:13px;margin:0">Already have an account? <a href="#" onclick="switchToLogin();return false" style="color:var(--accent);text-decoration:none;font-weight:700;cursor:pointer">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="main-content">
+            <div class="features-section">
+                <div class="feature-card fade-in"><div class="feature-icon">🏫</div><h4>Campus Only</h4><p>Order & pickup from canteen - Always Fresh!</p></div>
+                <div class="feature-card fade-in"><div class="feature-icon">⏱️</div><h4>Fast Prep</h4><p>Average prep time: 10–12 mins</p></div>
+                <div class="feature-card fade-in"><div class="feature-icon">💳</div><h4>Multiple Payments</h4><p>UPI, Card, Payroll Deduct & Cash</p></div>
+                <div class="feature-card fade-in"><div class="feature-icon">⭐</div><h4>Everyone's Deals</h4><p>Student, Faculty & Staff discounts</p></div>
+            </div>
+        </section>
+
+        <section class="menu-section" id="menuGrid">
+            <h2 style="color:#fff;margin-bottom:12px;font-size:32px;letter-spacing:1px;text-shadow:0 4px 12px rgba(0,229,195,0.3)">🍽️ Popular Menu</h2>
+            <p id="menuLoginHint" style="color:rgba(255,255,255,0.7);margin-bottom:18px;font-size:14px">🔒 Please login to place your order</p>
+            <div class="menu-grid">
+                <div class="menu-item" data-name="Masala Dosa" data-price="55">
+                    <img src="./images/m dosa.jpg" alt="Masala Dosa" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>Masala Dosa</h4>
+                    <p>Crispy dosa with spiced potato filling</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                <div class="menu-item" data-name="Veg Meals (Full)" data-price="80">
+                    <img src="./images/veg meals.jpg" alt="Veg Meals" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>Veg Meals (Full)</h4>
+                    <p> Unlimited Rice + sambar + one veg curry + papad + curd </p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                <div class="menu-item" data-name="Veg Biryani" data-price="90">
+                    <img src="./images/veg_biryani.jpg" alt="Veg Biryani" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>Veg Biryani</h4>
+                    <p>Flavour full Biryani with mixed vegetables</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                <div class="menu-item" data-name="Chicken Meals (Full)" data-price="130">
+                    <img src="./images/chicken_meals.avif" alt="Chicken Meals" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>Chicken Meals (Full)</h4>
+                    <p>Delicious chicken meal with sides</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                <div class="menu-item" data-name="Veg Fried Rice" data-price="80">
+                    <img src="./images/veg.jpg" alt="Veg Fried Rice" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>Veg Fried Rice</h4>
+                    <p>Fragrant rice stir-fried with mixed vegetables</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                <div class="menu-item" data-name="Veg Noodles" data-price="80">
+                    <img src="./images/veg_noodles.jpg" alt="Veg Noodles" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>Veg Noodles</h4>
+                    <p>Hakka noodles with vegetables</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                
+                <div class="menu-item" data-name="Paneer curry" data-price="80">
+                    <img src="./images/paneer-curry-recipe.jpg" alt="Paneer curry" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>🥬 Paneer curry</h4>
+                    <p>Gravy with soft paneer</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+                <div class="menu-item" data-name="Chicken Biryani" data-price="150">
+                    <img src="./images/Chicken-Biryani-Featured.jpg" alt="Chicken Biryani" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>🍗 Chicken Biryani</h4>
+                    <p>Aromatic rice with tender chicken pieces</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+              
+                <div class="menu-item" data-name="Filter Coffee" data-price="25">
+                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&h=200&fit=crop" alt="Filter Coffee" class="menu-item-image" onerror="this.style.display='none'">
+                    <h4>☕ Filter Coffee</h4>
+                    <p>Traditional South Indian filter coffee</p>
+                    <button class="add-btn" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="login-to-order" onclick="openLoginModal()">🔒 Login to Order</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="cart-fab" id="cartFab" onclick="toggleCart()">
+            <div style="font-weight:800">🧾</div>
+            <div style="font-size:13px">Cart</div>
+            <div class="cart-count" id="cartCount">0</div>
+        </div>
+
+        <div class="cart-modal" id="cartModal">
+            <h4 style="color:#fff;margin-bottom:12px;font-size:16px">🛒 Your Cart</h4>
+            <div id="cartItems" style="margin-bottom:12px"></div>
+            <div id="cartTotal" style="margin-bottom:14px;padding:10px;background:rgba(0,188,212,0.15);border-radius:8px;color:var(--accent);font-weight:800;font-size:15px;text-align:center">Total: ₹0</div>
+            <button class="checkout" onclick="checkoutOrder()" style="background:linear-gradient(90deg,#00bcd4,#00e5c3);color:white;padding:12px;border-radius:10px;border:none;width:100%;font-weight:800;margin-top:8px;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(0,188,212,0.3);transition:all 0.2s ease">✅ Place Order</button>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="contact-info">📞 +91-9876543210 &nbsp; • &nbsp; 📧 canteen@bvrit.ac.in</div>
+        <p style="margin-top:8px">&copy; 2026 BVRIT Canteen. Open: 7:00 AM - 9:00 PM</p>
+    </footer>
+
+    <script>
+        // Admin credentials (per requirement)
+        const ADMIN_EMAIL = 'canteenadmin@bvrit.ac.in';
+        const ADMIN_PASSWORD = 'admin098';
+        
+        // Track login state
+        let isLoggedIn = false;
+        let currentUsername = null;
+        let isAdmin = false;
+
+        // Modal functions
+        function openLoginModal(){
+            document.getElementById('loginModal').classList.add('show');
+        }
+        function closeClosedModal(){
+            document.getElementById('closedModal').classList.remove('show');
+        }
+        function closeLoginModal(){
+            document.getElementById('loginModal').classList.remove('show');
+            document.getElementById('userUsername').value = '';
+            document.getElementById('userPassword').value = '';
+            clearErrors();
+        }
+        window.onclick = function(e){
+            const modal = document.getElementById('loginModal');
+            if(e.target === modal) closeLoginModal();
+        }
+
+        // cart state
+        const cart = {};
+        function updateCartUI(){
+            const count = Object.values(cart).reduce((s,i)=>s+i.qty,0);
+            document.getElementById('cartCount').textContent = count;
+            const itemsEl = document.getElementById('cartItems');
+            itemsEl.innerHTML = '';
+            let total = 0;
+            for(const key in cart){
+                const it = cart[key];
+                total += it.price * it.qty;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `<div><strong style="color:#fff">${escapeHtml(it.name)}</strong><div style="font-size:12px;color:var(--muted)">₹${it.price} x ${it.qty}</div></div><div style="display:flex;gap:8px;align-items:center"><button class='quantity-btn' onclick="changeQty('${key}',-1)">-</button><button class='quantity-btn' onclick="changeQty('${key}',1)">+</button><button class='quantity-btn' style="background:#ef4444;color:white" onclick="discardItem('${key}')">✕</button></div>`;
+                itemsEl.appendChild(div);
+            }
+            document.getElementById('cartTotal').textContent = `Total: ₹${total}`;
+        }
+        function addToCart(btn){
+            if(!isLoggedIn){openLoginModal();return;}
+            const card = btn.closest('.menu-item');
+            if(!card) return;
+            const name = card.getAttribute('data-name');
+            const price = Number(card.getAttribute('data-price'))||0;
+            const key = name.replace(/\s+/g,'_').toLowerCase();
+            if(!cart[key]) cart[key] = {name,price,qty:0};
+            cart[key].qty += 1;
+            updateCartUI();
+            // small feedback
+            btn.textContent = '✓ Added!';
+            setTimeout(()=> btn.textContent = 'Add to Cart',700);
+        }
+        function changeQty(key,delta){
+            if(!cart[key]) return;
+            cart[key].qty += delta;
+            if(cart[key].qty<=0) delete cart[key];
+            updateCartUI();
+        }
+        function discardItem(key){
+            if(!cart[key]) return;
+            delete cart[key];
+            updateCartUI();
+        }
+        function toggleCart(){
+            document.getElementById('cartModal').classList.toggle('show');
+        }
+        // Close cart when clicking outside
+        document.addEventListener('click', function(event){
+            const cartModal = document.getElementById('cartModal');
+            const cartFab = document.getElementById('cartFab');
+            
+            // If cart is open and click is outside both cart and button, close it
+            if(cartModal.classList.contains('show') && 
+               !cartModal.contains(event.target) && 
+               !cartFab.contains(event.target)){
+                cartModal.classList.remove('show');
+            }
+        });
+        function checkoutOrder(){
+            if(Object.keys(cart).length===0){ alert('Cart is empty'); return; }
+            // Save cart to localStorage and redirect to checkout page
+            localStorage.setItem('bvrit_cart', JSON.stringify(cart));
+            window.location.href = 'checkout.html';
+        }
+
+        // --- Login & role logic ---
+        function validateEmailStrict(email){
+            const domain = '@bvrit.ac.in';
+            if(!email || typeof email !== 'string') return {valid:false,message:'Enter an email'};
+            if(!email.endsWith(domain)) return {valid:false,message:'Email must end with @bvrit.ac.in'};
+            const local = email.slice(0,-domain.length);
+            const ok = /^[A-Za-z0-9._+-]+$/.test(local);
+            if(!ok) return {valid:false,message:'Invalid email format'};
+            
+            // Check if this is a student email (starts with a digit)
+            if(/^[0-9]/.test(local)){
+                // Student email constraint: max 10 characters and at most 2 alphabets
+                if(local.length > 10){
+                    return {valid:false,message:'Student email should be max 10 characters (not including @bvrit.ac.in)'};
+                }
+                const alphabetCount = (local.match(/[A-Za-z]/g) || []).length;
+                if(alphabetCount > 2 || alphabetCount === 0){
+                    return {valid:false,message:'Student email should contain at most 2 alphabets'};
+                }
+            }
+            
+            return {valid:true,local};
+        }
+        function validatePasswordSimple(pwd){
+            if(!pwd||pwd.length===0) return {valid:false,message:'Password cannot be empty'};
+            if(pwd.length>10) return {valid:false,message:'Password must not exceed 10 chars'};
+            return {valid:true};
+        }
+        function classifyUser(local,fullEmail){
+            if(fullEmail===ADMIN_EMAIL) return 'admin';
+            const first = local.charAt(0);
+            if(/[0-9]/.test(first)){
+                const alphaCount = (local.match(/[A-Za-z]/g)||[]).length;
+                if(alphaCount<=2) return 'student';
+                return 'unknown';
+            }
+            if(/[A-Za-z]/.test(first)) return 'faculty';
+            return 'unknown';
+        }
+        function clearErrors(){
+            ['usernameError','passwordError'].forEach(id=>{const el=document.getElementById(id); if(el) el.classList.remove('show')});
+            ['userUsername','userPassword'].forEach(id=>{const inp=document.getElementById(id); if(inp) inp.classList.remove('error')});
+            const s=document.getElementById('loginSuccess'); if(s){s.classList.remove('show'); s.textContent=''}
+        }
+        function validateUsername(username){
+            if(!username||username.length===0) return {valid:false,message:'Username cannot be empty'};
+            if(username.length<3) return {valid:false,message:'Username must be at least 3 characters'};
+            if(username.length>20) return {valid:false,message:'Username must not exceed 20 characters'};
+            if(!/^[A-Za-z0-9_-]+$/.test(username)) return {valid:false,message:'Username can only contain letters, numbers, _ and -'};
+            return {valid:true};
+        }
+        function validateAdminEmail(email){
+            if(!email||email.length===0) return {valid:false,message:'Email cannot be empty'};
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!emailRegex.test(email)) return {valid:false,message:'Please enter a valid email address'};
+            return {valid:true};
+        }
+        function handleLogin(e){
+            e.preventDefault(); clearErrors();
+            
+            // Check canteen operating hours (7am to 9pm) - skip for admins
+            const now = new Date();
+            const currentHour = now.getHours();
+            
+            const username = document.getElementById('userUsername').value.trim();
+            const pwd = document.getElementById('userPassword').value;
+            
+            // Check if trying to login as admin first
+            if(username === ADMIN_EMAIL && pwd === ADMIN_PASSWORD) {
+                isAdmin = true;
+                const s=document.getElementById('loginSuccess');
+                s.textContent='🔐 Admin access granted!';
+                s.style.background='';
+                s.style.color='';
+                s.classList.add('show');
+                currentUsername = 'admin';
+                localStorage.setItem('bvrit_current_user', 'admin');
+                localStorage.setItem('bvrit_is_admin', 'true');
+                setTimeout(()=>{ window.location.href = 'admin.html'; },500);
+                return;
+            }
+            
+            // For regular users, check closing hours
+            if(currentHour < 7 || currentHour > 20 || (currentHour === 20 && new Date().getMinutes() >= 30)){
+                const s=document.getElementById('loginSuccess');
+                s.textContent='🚫 Our canteen is closed! Operating hours: 7:00 AM - 8:30 PM. Please order tomorrow.';
+                s.style.background='#dc2626';
+                s.style.color='white';
+                s.classList.add('show');
+                setTimeout(()=>{ s.classList.remove('show'); s.style.background=''; s.style.color=''; },20000);
+                return;
+            }
+            
+            // Check if username is empty
+            if(!username || username.length === 0){
+                document.getElementById('usernameError').textContent='Username cannot be empty';
+                document.getElementById('usernameError').classList.add('show');
+                document.getElementById('userUsername').classList.add('error');
+                return;
+            }
+            
+            let hasError=false;
+            const uv = validateUsername(username);
+            if(!uv.valid){document.getElementById('usernameError').textContent=uv.message;document.getElementById('usernameError').classList.add('show');document.getElementById('userUsername').classList.add('error');hasError=true}
+            const pv = validatePasswordSimple(pwd);
+            if(!pv.valid){document.getElementById('passwordError').textContent=pv.message;document.getElementById('passwordError').classList.add('show');document.getElementById('userPassword').classList.add('error');hasError=true}
+            if(hasError) return;
+
+            // Verify against stored accounts in localStorage
+            const users = JSON.parse(localStorage.getItem('bvrit_users')||'{}');
+            const account = users[username];
+            if(!account){
+                document.getElementById('usernameError').textContent='No account found. Please sign up first.';
+                document.getElementById('usernameError').classList.add('show');document.getElementById('userUsername').classList.add('error');
+                // Auto-show signup suggestion after 2 seconds
+                setTimeout(()=>{
+                    const confirmSignup = confirm('Account not found!\\n\\nWould you like to create a new account?');
+                    if(confirmSignup) switchToSignup();
+                }, 1500);
+                return;
+            }
+            if(account.password !== pwd){
+                document.getElementById('passwordError').textContent='Invalid credentials';
+                document.getElementById('passwordError').classList.add('show');document.getElementById('userPassword').classList.add('error');
+                return;
+            }
+
+            // Successful login
+            const s=document.getElementById('loginSuccess');
+            s.textContent=`Welcome ${username}!`;
+            s.style.background='';
+            s.style.color='';
+            s.classList.add('show');
+            currentUsername = username;
+            localStorage.setItem('bvrit_current_user', username);
+            setTimeout(()=>{ window.location.href = 'order-type.html'; },500);
+        }
+
+        // Signup helpers
+        function openSignupModal(){ document.getElementById('signupModal').classList.add('show'); }
+        function closeSignupModal(){
+            document.getElementById('signupModal').classList.remove('show');
+            const u=document.getElementById('signupUsername'); if(u) u.value='';
+            const e=document.getElementById('signupEmail'); if(e) e.value='';
+            const p=document.getElementById('signupPassword'); if(p) p.value='';
+            const cp=document.getElementById('signupConfirmPassword'); if(cp) cp.value='';
+            const su=document.getElementById('signupUsernameError'); if(su) su.classList.remove('show');
+            const se=document.getElementById('signupEmailError'); if(se) se.classList.remove('show');
+            const sp=document.getElementById('signupPasswordError'); if(sp) sp.classList.remove('show');
+            const scp=document.getElementById('signupConfirmPasswordError'); if(scp) scp.classList.remove('show');
+            const s=document.getElementById('signupSuccess'); if(s){s.classList.remove('show'); s.textContent=''}
+        }
+        // Switch between login and signup
+        function switchToSignup(){
+            closeLoginModal();
+            setTimeout(()=> openSignupModal(), 300);
+        }
+        function switchToLogin(){
+            closeSignupModal();
+            setTimeout(()=> openLoginModal(), 300);
+        }
+        function handleSignup(e){
+            e.preventDefault();
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const pwd = document.getElementById('signupPassword').value;
+            const confirmPwd = document.getElementById('signupConfirmPassword').value;
+            // clear errors
+            const su=document.getElementById('signupUsernameError'); if(su) su.classList.remove('show');
+            const se=document.getElementById('signupEmailError'); if(se) se.classList.remove('show');
+            const sp=document.getElementById('signupPasswordError'); if(sp) sp.classList.remove('show');
+            const scp=document.getElementById('signupConfirmPasswordError'); if(scp) scp.classList.remove('show');
+
+            let hasError=false;
+            const uv = validateUsername(username);
+            if(!uv.valid){document.getElementById('signupUsernameError').textContent=uv.message;document.getElementById('signupUsernameError').classList.add('show');hasError=true}
+            const ev = validateEmailStrict(email);
+            if(!ev.valid){document.getElementById('signupEmailError').textContent=ev.message;document.getElementById('signupEmailError').classList.add('show');hasError=true}
+            const pv = validatePasswordSimple(pwd);
+            if(!pv.valid){document.getElementById('signupPasswordError').textContent=pv.message;document.getElementById('signupPasswordError').classList.add('show');hasError=true}
+            if(pwd !== confirmPwd){document.getElementById('signupConfirmPasswordError').textContent='Passwords do not match';document.getElementById('signupConfirmPasswordError').classList.add('show');hasError=true}
+            if(hasError) return;
+
+            const users = JSON.parse(localStorage.getItem('bvrit_users')||'{}');
+            if(users[username]){
+                document.getElementById('signupUsernameError').textContent='Username already exists';document.getElementById('signupUsernameError').classList.add('show');
+                return;
+            }
+            // Check if email already registered
+            for(const u in users){
+                if(users[u].email === email){
+                    document.getElementById('signupEmailError').textContent='This email is already registered';document.getElementById('signupEmailError').classList.add('show');
+                    return;
+                }
+            }
+            users[username] = { password: pwd, email: email };
+            localStorage.setItem('bvrit_users', JSON.stringify(users));
+            const s=document.getElementById('signupSuccess'); s.textContent='Account created successfully!'; s.classList.add('show');
+            // auto-login after signup and redirect to order-type
+            currentUsername = username;
+            localStorage.setItem('bvrit_current_user', username);
+            setTimeout(()=>{ window.location.href = 'order-type.html'; },500);
+        }
+
+        // Enable cart and buttons after login
+        function enableCartAndButtons(){
+            isLoggedIn = true;
+            document.getElementById('cartFab').classList.add('show');
+            // Show Add to Cart buttons, hide Login to Order buttons
+            document.querySelectorAll('.add-btn').forEach(btn => btn.classList.add('show'));
+            document.querySelectorAll('.login-to-order').forEach(btn => btn.style.display = 'none');
+            // Update menu hint
+            const hint = document.getElementById('menuLoginHint');
+            if(hint) hint.innerHTML = `✅ Welcome! You can now add items to your cart.`;
+        }
+        
+        // Handle Order Now button click
+        function handleOrderNow(){
+            // Allow admins to bypass closing hours
+            if(isAdmin) {
+                document.getElementById('menuGrid').scrollIntoView({behavior:'smooth'});
+                return;
+            }
+            // Check if canteen is closed for regular users
+            const now = new Date();
+            const currentHour = now.getHours();
+            if(currentHour < 7 || currentHour >= 21){
+                // Show closed message modal
+                document.getElementById('closedModal').classList.add('show');
+                return;
+            }
+            
+            if(!isLoggedIn){
+                openLoginModal();
+            } else {
+                document.getElementById('menuGrid').scrollIntoView({behavior:'smooth'});
+            }
+        }
+
+        // small util
+        function escapeHtml(str){return String(str).replace(/[&<>\"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":"&#39;"}[m]})}
+
+        // ========== DAILY SPECIALS SYSTEM ==========
+        const dailySpecials = {
+            0: { // Sunday - Family Day
+                dayName: "SUNDAY",
+                theme: "Family Feast Day 👨‍👩‍👧‍👦",
+                mainOffer: "Family Combo: Buy 3 meals, get 1 FREE!",
+                gradient: "linear-gradient(135deg,#e91e63,#f06292)",
+                offers: [
+                    { icon: "�", title: "Biryani Special", desc: "Biryani + Drink ₹110", bg: "linear-gradient(135deg,#fff8e1,#ffecb3)", titleColor: "#f57c00", descColor: "#795548" },
+                    { icon: "🍱", title: "Thali + Dessert", desc: "Premium Combo ₹130", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "☕", title: "Combo + Tea", desc: "FREE Tea with combo", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "👨‍👩‍👧", title: "Family Pack", desc: "4 Meals ₹350", bg: "linear-gradient(135deg,#fce4ec,#f8bbd9)", titleColor: "#c2185b", descColor: "#880e4f" }
+                ],
+                heroText: "🎉 Sunday Special: <strong style='color:#e91e63'>Family Combo - Buy 3 Get 1 FREE</strong> | All day offer!"
+            },
+            1: { // Monday - Motivation Monday
+                dayName: "MONDAY",
+                theme: "Motivation Monday ☕",
+                mainOffer: "FREE Coffee with any meal above ₹80!",
+                gradient: "linear-gradient(135deg,#4caf50,#81c784)",
+                offers: [
+                    { icon: "🌅", title: "Breakfast Deal", desc: "Breakfast + Coffee ₹50", bg: "linear-gradient(135deg,#e8f5e9,#c8e6c9)", titleColor: "#2e7d32", descColor: "#1b5e20" },
+                    { icon: "🍱", title: "Thali + Coffee", desc: "Premium Thali Combo", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "🥪", title: "Snack + Tea", desc: "Tea + Samosa ₹25", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "☕", title: "Coffee FREE", desc: "With meals >₹80", bg: "linear-gradient(135deg,#efebe9,#d7ccc8)", titleColor: "#5d4037", descColor: "#3e2723" }
+                ],
+                heroText: "☕ Monday Motivation: <strong style='color:#4caf50'>FREE Coffee</strong> with meals above ₹80!"
+            },
+            2: { // Tuesday - Tasty Tuesday
+                dayName: "TUESDAY",
+                theme: "Tasty Tuesday 🍛",
+                mainOffer: "25% OFF on all Biryani variants!",
+                gradient: "linear-gradient(135deg,#ff9800,#ffb74d)",
+                offers: [
+                    { icon: "🍚", title: "Veg Biryani", desc: "Special Price ₹75", bg: "linear-gradient(135deg,#fff8e1,#ffecb3)", titleColor: "#f57c00", descColor: "#e65100" },
+                    { icon: "🍛", title: "Special Biryani", desc: "Premium ₹90", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "🥗", title: "Biryani + Raita", desc: "Combo ₹85", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "🔥", title: "All Biryani", desc: "25% OFF Today", bg: "linear-gradient(135deg,#fff3e0,#ffe0b2)", titleColor: "#e65100", descColor: "#bf360c" }
+                ],
+                heroText: "🍛 Tasty Tuesday: <strong style='color:#ff9800'>25% OFF</strong> on all Biryani variants!"
+            },
+            3: { // Wednesday - Wellness Wednesday
+                dayName: "WEDNESDAY",
+                theme: "Wellness Wednesday 🥗",
+                mainOffer: "Healthy options at 20% OFF!",
+                gradient: "linear-gradient(135deg,#8bc34a,#aed581)",
+                offers: [
+                    { icon: "🥗", title: "Fresh Salad", desc: "Salad Bowl ₹40", bg: "linear-gradient(135deg,#f1f8e9,#dcedc8)", titleColor: "#558b2f", descColor: "#33691e" },
+                    { icon: "🍱", title: "Diet Thali", desc: "Healthy Thali ₹100", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "🍹", title: "Fruit + Juice", desc: "Fresh Combo ₹45", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "💚", title: "Healthy Menu", desc: "20% OFF All", bg: "linear-gradient(135deg,#e8f5e9,#c8e6c9)", titleColor: "#2e7d32", descColor: "#1b5e20" }
+                ],
+                heroText: "🥗 Wellness Wednesday: <strong style='color:#8bc34a'>20% OFF</strong> on healthy menu items!"
+            },
+            4: { // Thursday - Thali Thursday
+                dayName: "THURSDAY",
+                theme: "Thali Thursday 🍱",
+                mainOffer: "Premium Thali at ₹99 for everyone!",
+                gradient: "linear-gradient(135deg,#9c27b0,#ba68c8)",
+                offers: [
+                    { icon: "🍽️", title: "Mini Thali", desc: "Budget Thali ₹70", bg: "linear-gradient(135deg,#fff8e1,#ffecb3)", titleColor: "#f57c00", descColor: "#795548" },
+                    { icon: "🍱", title: "Premium Thali", desc: "Special ₹99", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "⭐", title: "Regular Thali", desc: "Full Meal ₹85", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "🔥", title: "All Thalis", desc: "₹99 Today Only", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#4a148c" }
+                ],
+                heroText: "🍱 Thali Thursday: <strong style='color:#9c27b0'>Premium Thali ₹99</strong> for everyone!"
+            },
+            5: { // Friday - Fried-day Friday
+                dayName: "FRIDAY",
+                theme: "Fry-Day Friday 🍟",
+                mainOffer: "All fried snacks at FLAT 30% OFF!",
+                gradient: "linear-gradient(135deg,#f44336,#ef5350)",
+                offers: [
+                    { icon: "🥟", title: "Samosa + Vada", desc: "Combo ₹30", bg: "linear-gradient(135deg,#ffebee,#ffcdd2)", titleColor: "#c62828", descColor: "#b71c1c" },
+                    { icon: "🍟", title: "Snack Platter", desc: "Assorted ₹60", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "☕", title: "Tea + Pakoda", desc: "Evening Snack ₹35", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "🔥", title: "All Snacks", desc: "30% OFF Today", bg: "linear-gradient(135deg,#ffebee,#ffcdd2)", titleColor: "#d32f2f", descColor: "#c62828" }
+                ],
+                heroText: "🍟 Fry-Day Friday: <strong style='color:#f44336'>30% OFF</strong> on all fried snacks!"
+            },
+            6: { // Saturday - Sweet Saturday
+                dayName: "SATURDAY",
+                theme: "Sweet Saturday 🍰",
+                mainOffer: "FREE Dessert with meals above ₹100!",
+                gradient: "linear-gradient(135deg,#e91e63,#f48fb1)",
+                offers: [
+                    { icon: "🍦", title: "Ice Cream", desc: "Special ₹25", bg: "linear-gradient(135deg,#fce4ec,#f8bbd9)", titleColor: "#c2185b", descColor: "#880e4f" },
+                    { icon: "🍮", title: "Gulab Jamun", desc: "FREE with meal", bg: "linear-gradient(135deg,#e3f2fd,#bbdefb)", titleColor: "#1976d2", descColor: "#455a64" },
+                    { icon: "🍩", title: "Jalebi + Tea", desc: "Combo ₹40", bg: "linear-gradient(135deg,#f3e5f5,#e1bee7)", titleColor: "#7b1fa2", descColor: "#6a1b9a" },
+                    { icon: "🎁", title: "Free Dessert", desc: "With meals >₹100", bg: "linear-gradient(135deg,#fce4ec,#f8bbd9)", titleColor: "#c2185b", descColor: "#880e4f" }
+                ],
+                heroText: "🍰 Sweet Saturday: <strong style='color:#e91e63'>FREE Dessert</strong> with meals above ₹100!"
+            }
+        };
+
+        function loadDailySpecials() {
+            const today = new Date().getDay();
+            const special = dailySpecials[today];
+            
+            // Update badge
+            const badge = document.getElementById('dailyBadge');
+            // Daily special removed - using highlights instead
+        }
+
+        function updateCanteenStatus() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const statusDiv = document.getElementById('canteenStatus');
+            if(statusDiv) {
+                if(currentHour >= 7 && currentHour < 21) {
+                    statusDiv.style.background = 'linear-gradient(90deg,#4caf50,#8bc34a)';
+                    statusDiv.innerHTML = '<span>✅</span> OPEN NOW: 7:00 AM - 9:00 PM';
+                } else {
+                    statusDiv.style.background = 'linear-gradient(90deg,#f44336,#e53935)';
+                    statusDiv.innerHTML = '<span>🚫</span> CLOSED: Opens at 7:00 AM';
+                }
+            }
+        }
+
+        // init
+        updateCartUI();
+        loadDailySpecials();
+        updateCanteenStatus();
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
