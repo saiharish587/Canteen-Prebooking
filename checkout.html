@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRIT Canteen - Checkout</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo">🍽️ BVRIT CANTEEN</div>
+                <div class="tagline">Fresh • Fast • Friendly</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="checkout-container">
+            <div class="checkout-header">
+                <h1>🛍️ Order Summary</h1>
+                <p>Review your items and proceed to payment</p>
+            </div>
+
+            <!-- Order Summary Section -->
+            <div class="order-summary">
+                <div class="section-title">📋 Your Selected Items</div>
+                <div id="itemsList"></div>
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">₹0</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>🎯 Total Amount</span>
+                        <span id="totalAmount">₹0</span>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-back" onclick="goBack()" style="background:linear-gradient(90deg,#ff9800,#ffb74d);color:white;border:none">✏️ Edit Orders</button>
+                    <button class="btn btn-place-order" onclick="showPayment()">📦 Place Order</button>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="payment-section" id="paymentSection">
+                <div class="section-title">💳 Select Payment Method</div>
+                <div class="payment-options" id="paymentOptions">
+                    <div class="payment-option" onclick="selectPayment('upi', this)">
+                        <div class="payment-option-icon">📱</div>
+                        <div class="payment-option-name">UPI</div>
+                    </div>
+                    <div class="payment-option" onclick="selectPayment('card', this)">
+                        <div class="payment-option-icon">💳</div>
+                        <div class="payment-option-name">Card</div>
+                    </div>
+                </div>
+
+                <!-- UPI Payment -->
+                <div id="upiForm" style="display:none">
+                    <div style="text-align:center;margin-bottom:16px">
+                        <div id="qrCode" style="display:none;background:white;padding:20px;border-radius:12px;width:fit-content;margin:0 auto">
+                            <p style="color:var(--muted);font-size:12px;margin-bottom:8px">Scan with your UPI app:</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=bvritcanteen@upi%26pn=BVRIT%20Canteen%26cu=INR" 
+                                 alt="UPI QR Code" 
+                                 width="200" 
+                                 height="200" 
+                                 style="border-radius:8px;border:1px solid #ccc;">
+                            <p style="color:var(--accent);font-weight:700;margin-top:12px;font-size:14px">UPI: bvritcanteen@upi</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="upiId">Or Enter UPI ID</label>
+                        <input id="upiId" type="text" placeholder="e.g., yourname@upi">
+                    </div>
+                </div>
+
+                <!-- Card Payment -->
+                <div id="cardForm" style="display:none">
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number</label>
+                        <input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date</label>
+                            <input id="expiryDate" type="text" placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input id="cvv" type="text" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="success-message" id="successMsg"></div>
+                <div class="error-message" id="errorMsg"></div>
+                <div class="loading" id="loadingSpinner">
+                    <div class="spinner"></div>
+                    <p style="margin-top:12px">Processing your payment...</p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-pay-now show" id="payNowBtn" onclick="processPayment()">💳 Pay Now ₹<span id="payAmount">0</span></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 BVRIT Canteen. For support: 📞 Ext. 9874562310
+
+        </p>
+    </footer>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-body text-center p-4 p-md-5" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+                    <!-- Success Animation -->
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 100px; height: 100px; background: linear-gradient(135deg, #00d4aa, #00bcd4); animation: pulse 2s infinite;">
+                            <span style="font-size: 50px;">🎉</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h2 class="fw-bold mb-2" style="color: #00d4aa; font-size: 2rem;">Order Confirmed!</h2>
+                    <p class="text-white-50 mb-4">Your order has been successfully placed</p>
+                    
+                    <!-- Order Details Card -->
+                    <div class="card mb-4 border-0" style="background: rgba(255,255,255,0.1); border-radius: 15px;">
+                        <div class="card-body p-3" id="successDetails">
+                            <!-- Details will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Greeting Message -->
+                    <div class="mb-4" id="greetingMessage" style="color: #fff;">
+                        <!-- Greeting will be inserted here -->
+                    </div>
+
+                    <!-- Pickup Instruction -->
+                    <div class="alert mb-4" style="background: linear-gradient(90deg, #ff9800, #ffb74d); border: none; border-radius: 12px; color: #000;">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <span class="me-2" style="font-size: 24px;">📋</span>
+                            <div class="text-start">
+                                <strong>Pick up your order at the Canteen Counter</strong><br>
+                                <small>Show your Order ID to collect your meal</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prep Time Info -->
+                    <div class="mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.05);">
+                        <p class="mb-0 text-white-50">
+                            Your delicious meal is now being prepared in our kitchen!<br>
+                            <span class="badge mt-2" style="background: linear-gradient(90deg, #00bcd4, #00d4aa); font-size: 14px; padding: 8px 16px;">
+                                ⏱️ Expected preparation time: 10-15 minutes
+                            </span>
+                        </p>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <button class="btn btn-lg w-100 mb-3" onclick="logoutUser()" style="background: linear-gradient(90deg, #e53935, #ef5350); color: white; border: none; border-radius: 12px; padding: 14px; font-weight: 600;">
+                        🚪 Logout & Go to Home
+                    </button>
+
+                    <!-- Countdown -->
+                    <div class="text-white-50">
+                        Redirecting to home in <span class="badge bg-secondary" id="countdownNumber" style="font-size: 14px;">15</span> seconds...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        #successModal .modal-content {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+
+    <script src="js/checkout.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
