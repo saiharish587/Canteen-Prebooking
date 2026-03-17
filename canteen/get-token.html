@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS Token Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .token-display {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .kds-link {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .kds-link:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .kds-link.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0c5aa0;
+            margin-top: 15px;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .admin-hints {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #856404;
+            margin-top: 15px;
+        }
+
+        .admin-hints strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .admin-hints div {
+            margin: 4px 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍲 Kitchen Display</h1>
+            <p>Quick Token Generator</p>
+        </div>
+
+        <div id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="email">Admin Email</label>
+                <input type="password" id="email" placeholder="e.g., admin@bvrit.ac.in" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="getTokenBtn" onclick="getToken()">Get Token</button>
+            </div>
+
+            <div class="admin-hints">
+                <strong>Default Admin Credentials:</strong>
+                <div>Email: <code>admin@bvrit.ac.in</code></div>
+                <div>Password: <code>admin@123</code></div>
+            </div>
+        </div>
+
+        <div id="resultSection" class="result-section">
+            <div id="message"></div>
+
+            <div id="tokenContainer" style="display: none;">
+                <label>Your Token:</label>
+                <div class="token-display" id="tokenDisplay"></div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="copyToken()">📋 Copy Token</button>
+                    <button class="btn-primary" onclick="openKDS()">🚀 Open KDS</button>
+                </div>
+
+                <div class="info-box">
+                    <strong>Token saved!</strong> The token is stored in your browser and will be automatically used when you open the Kitchen Display System.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = '';
+
+        async function getToken() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('getTokenBtn');
+            const resultSection = document.getElementById('resultSection');
+            const messageDiv = document.getElementById('message');
+            const tokenContainer = document.getElementById('tokenContainer');
+
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span>Getting token...';
+            messageDiv.innerHTML = '';
+            tokenContainer.style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost/canteen-api/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || `Login failed (${response.status})`);
+                }
+
+                // Check for token in different possible response structures
+                let token = data.token || data.data?.access_token || data.access_token;
+                
+                if (!token) {
+                    throw new Error('No token received from server');
+                }
+
+                // Save token to localStorage
+                currentToken = token;
+                localStorage.setItem('kds_token', token);
+
+                // Show success
+                showSuccess(`✓ Token generated successfully for <strong>${email}</strong>`);
+                document.getElementById('tokenDisplay').textContent = token;
+                tokenContainer.style.display = 'block';
+
+                resultSection.classList.add('show');
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message || 'Failed to get token. Check your credentials and try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Get Token';
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('message').innerHTML = `<div class="error-message">❌ ${message}</div>`;
+            document.getElementById('resultSection').classList.add('show');
+        }
+
+        function showSuccess(message) {
+            document.getElementById('message').innerHTML = `<div class="success-message">${message}</div>`;
+        }
+
+        function copyToken() {
+            if (!currentToken) return;
+            
+            navigator.clipboard.writeText(currentToken).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(() => {
+                alert('Failed to copy token');
+            });
+        }
+
+        function openKDS() {
+            if (!currentToken) return;
+            
+            // Store token in localStorage (already done, but just to be sure)
+            localStorage.setItem('kds_token', currentToken);
+            
+            // Open KDS in new tab
+            window.open('kds.html', '_blank');
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getToken();
+            }
+        });
+        
+        document.getElementById('email').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getToken();
+            }
+        });
+
+        // Check if token already exists and show quick access
+        window.addEventListener('load', () => {
+            const savedToken = localStorage.getItem('kds_token');
+            if (savedToken) {
+                currentToken = savedToken;
+                const resultSection = document.getElementById('resultSection');
+                const messageDiv = document.getElementById('message');
+                const tokenContainer = document.getElementById('tokenContainer');
+                
+                messageDiv.innerHTML = '<div class="success-message">✓ Existing token found in browser</div>';
+                document.getElementById('tokenDisplay').textContent = savedToken;
+                tokenContainer.style.display = 'block';
+                resultSection.classList.add('show');
+
+                // Auto-focus on new credentials input
+                document.getElementById('email').focus();
+            }
+        });
+    </script>
+</body>
+</html>

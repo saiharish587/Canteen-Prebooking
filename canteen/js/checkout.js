@@ -1,6 +1,22 @@
 let selectedPaymentMethod = null;
 let cartData = null;
 
+// Check auth before init
+function checkAuthBeforeCheckout(){
+    const token = localStorage.getItem('bvrit_access_token');
+    const user = localStorage.getItem('bvrit_current_user');
+    
+    console.log('Checkout auth check:');
+    console.log('Token exists:', !!token);
+    console.log('User:', user);
+    
+    if(!token || !user) {
+        alert('Please login to proceed to checkout.');
+        window.location.href = 'index.html';
+        return;
+    }
+}
+
 // Initialize page
 function initCheckout(){
     const cart = JSON.parse(localStorage.getItem('bvrit_cart') || '{}');
@@ -80,55 +96,136 @@ function selectPayment(method, element){
 
 // Process payment
 function processPayment(){
+    console.log('=== processPayment START ===');
+    console.log('selectedPaymentMethod:', selectedPaymentMethod);
+    
     if(!selectedPaymentMethod){
+        console.error('❌ No payment method selected');
         showError('Please select a payment method');
         return;
     }
 
     // Validate based on payment method
     if(selectedPaymentMethod === 'upi'){
+        console.log('Validating UPI payment...');
         // QR code shown, user can scan or enter manually
         const upiId = document.getElementById('upiId').value.trim();
+        console.log('UPI ID provided?', !!upiId);
+        
         if(!upiId) {
             // Allow QR code payment without manual entry
             // In real scenario, QR would initiate payment
+            console.log('✅ QR code payment mode');
         }
         else if(!upiId.includes('@')){
+            console.error('❌ Invalid UPI ID format');
             showError('Please enter a valid UPI ID');
             return;
         }
     }
     else if(selectedPaymentMethod === 'card'){
+        console.log('Validating card payment...');
         const cardNumber = document.getElementById('cardNumber').value.trim().replace(/\s/g, '');
         const expiryDate = document.getElementById('expiryDate').value.trim();
         const cvv = document.getElementById('cvv').value.trim();
         
+        console.log('Card validation:', {cardNumber: cardNumber.length + ' digits', expiryDate, cvv: '***'});
+        
         if(!cardNumber || cardNumber.length !== 16){
+            console.error('❌ Invalid card number');
             showError('Please enter a valid 16-digit card number');
             return;
         }
         if(!expiryDate || !expiryDate.includes('/')){
+            console.error('❌ Invalid expiry date format');
             showError('Please enter expiry date in MM/YY format');
             return;
         }
         if(!cvv || cvv.length < 3){
+            console.error('❌ Invalid CVV');
             showError('Please enter a valid CVV');
             return;
         }
     }
+    else if(selectedPaymentMethod === 'cash'){
+        console.log('✅ Cash payment selected - no validation needed');
+    }
 
     // Process payment
+    console.log('✅ Validation passed - calling processPaymentTransaction()');
     processPaymentTransaction();
 }
 
-// Simulate payment transaction
-function processPaymentTransaction(){
+// Process payment by creating order from existing cart
+async function processPaymentTransaction(){
+    console.log('=== processPaymentTransaction START ===');
     showLoading(true);
-    setTimeout(()=>{
+    
+    try {
+        console.log('Step 1: Checking payment method');
+        console.log('selectedPaymentMethod:', selectedPaymentMethod);
+        
+        if(!selectedPaymentMethod){
+            showLoading(false);
+            showError('Please select a payment method');
+            console.error('❌ No payment method selected');
+            return;
+        }
+        
+        console.log('Step 2: Syncing cart items to API...');
+        console.log('cartData:', cartData);
+        console.log('window.apiService exists?', !!window.apiService);
+        
+        // First, sync local cart items to API
+        try {
+            for(const key in cartData) {
+                const item = cartData[key];
+                console.log(`Processing item: ${key}`, item);
+                
+                if(item.itemId && item.qty > 0) {
+                    console.log(`Adding ${item.qty}x ${item.name} (ID: ${item.itemId}) to cart`);
+                    const response = await window.apiService.addToCart(item.itemId, item.qty, '');
+                    console.log(`Response for ${item.name}:`, response);
+                    
+                    if(!response.success) {
+                        console.warn(`Failed to add ${item.name} to cart:`, response);
+                    }
+                }
+            }
+            console.log('✅ Cart sync complete');
+        } catch(e) {
+            console.error('Error syncing cart items:', e);
+            console.error('Stack:', e.stack);
+            showLoading(false);
+            showError('Failed to sync cart items: ' + e.message);
+            return;
+        }
+        
+        // Create order from API cart
+        console.log('Step 3: Getting order details');
+        const orderType = localStorage.getItem('bvrit_order_type') || 'takeaway';
+        console.log('🛍️ Order type:', orderType);
+        console.log('💳 Payment method:', selectedPaymentMethod);
+        console.log('Creating order with:', {orderType, selectedPaymentMethod});
+        
+        console.log('Step 4: Calling createOrder()');
+        console.log('API Service URL check:', window.apiService);
+        
+        const orderResponse = await window.apiService.createOrder(orderType, selectedPaymentMethod);
+        
+        console.log('✅ Order response received:', orderResponse);
+        
+        if(!orderResponse.success){
+            console.error('❌ Order creation failed');
+            showLoading(false);
+            throw new Error(orderResponse.message || orderResponse.error || 'Failed to create order');
+        }
+        
+        console.log('✅ Order created successfully!');
         showLoading(false);
         
         const total = document.getElementById('totalAmount').textContent;
-        const orderNumber = 'ORD' + Date.now().toString().slice(-6);
+        const orderNumber = orderResponse.data?.order_number || orderResponse.data?.order_id || ('ORD' + Date.now().toString().slice(-6));
         const username = localStorage.getItem('bvrit_current_user') || 'Valued Customer';
         
         // Populate order details
@@ -193,7 +290,15 @@ function processPaymentTransaction(){
                 window.location.href = 'index.html';
             }
         }, 1000);
-    }, 2000);
+    } catch(error) {
+        console.error('=== ERROR IN PAYMENT PROCESSING ===');
+        console.error('Error object:', error);
+        console.error('Error message:', error.message);
+        console.error('Stack trace:', error.stack);
+        
+        showLoading(false);
+        showError('Failed to create order: ' + error.message);
+    }
 }
 
 // Utility functions
@@ -234,4 +339,5 @@ function escapeHtml(str){
 }
 
 // Initialize on load
+checkAuthBeforeCheckout();
 initCheckout();

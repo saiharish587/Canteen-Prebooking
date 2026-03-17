@@ -1,6 +1,6 @@
 // Admin credentials (per requirement)
-const ADMIN_EMAIL = 'canteenadmin@bvrit.ac.in';
-const ADMIN_PASSWORD = 'admin098';
+const ADMIN_EMAIL = 'admin@bvrit.ac.in';
+const ADMIN_PASSWORD = 'admin@123';
 
 // Track login state
 let isLoggedIn = false;
@@ -99,23 +99,25 @@ function validateEmailStrict(email){
     const ok = /^[A-Za-z0-9._+-]+$/.test(local);
     if(!ok) return {valid:false,message:'Invalid email format'};
     
-    // Check if this is a student email (starts with a digit)
-    if(/^[0-9]/.test(local)){
-        // Student email constraint: max 10 characters and at most 2 alphabets
-        if(local.length > 10){
-            return {valid:false,message:'Student email should be max 10 characters (not including @bvrit.ac.in)'};
-        }
-        const alphabetCount = (local.match(/[A-Za-z]/g) || []).length;
-        if(alphabetCount > 2 || alphabetCount === 0){
-            return {valid:false,message:'Student email should contain at most 2 alphabets'};
-        }
+    // Email constraint: at most 15 characters (supports student IDs like 24211a6763)
+    if(local.length > 15){
+        return {valid:false,message:'Email should be at most 15 characters (not including @bvrit.ac.in)'};
+    }
+    
+    if(local.length < 1){
+        return {valid:false,message:'Email cannot be empty'};
     }
     
     return {valid:true,local};
 }
 function validatePasswordSimple(pwd){
     if(!pwd||pwd.length===0) return {valid:false,message:'Password cannot be empty'};
-    if(pwd.length>10) return {valid:false,message:'Password must not exceed 10 chars'};
+    if(pwd.length<8) return {valid:false,message:'Password must be at least 8 characters'};
+    if(pwd.length>50) return {valid:false,message:'Password must not exceed 50 characters'};
+    if(!/[A-Z]/.test(pwd)) return {valid:false,message:'Password must contain at least one uppercase letter'};
+    if(!/[a-z]/.test(pwd)) return {valid:false,message:'Password must contain at least one lowercase letter'};
+    if(!/[0-9]/.test(pwd)) return {valid:false,message:'Password must contain at least one number'};
+    if(!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) return {valid:false,message:'Password must contain at least one special character (!@#$%^&*)'};
     return {valid:true};
 }
 function classifyUser(local,fullEmail){
@@ -136,9 +138,20 @@ function clearErrors(){
 }
 function validateUsername(username){
     if(!username||username.length===0) return {valid:false,message:'Username cannot be empty'};
+    
+    // Check if it's an email (for admin login or email-based accounts)
+    if(username.includes('@')){
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailRegex.test(username)) return {valid:false,message:'Please enter a valid email address'};
+        return {valid:true};
+    }
+    
+    // Otherwise, validate as username
     if(username.length<3) return {valid:false,message:'Username must be at least 3 characters'};
     if(username.length>20) return {valid:false,message:'Username must not exceed 20 characters'};
-    if(!/^[A-Za-z0-9_-]+$/.test(username)) return {valid:false,message:'Username can only contain letters, numbers, _ and -'};
+    if(!/^[A-Za-z]/.test(username)) return {valid:false,message:'Username must start with a letter'};
+    if(!/^[A-Za-z][A-Za-z0-9_-]*$/.test(username)) return {valid:false,message:'Username can only contain letters, numbers, _ and - (no spaces or special characters)'};
+    if(/ {2,}/.test(username)) return {valid:false,message:'Username cannot have consecutive spaces'};
     return {valid:true};
 }
 function validateAdminEmail(email){
@@ -198,34 +211,89 @@ function handleLogin(e){
     if(!pv.valid){document.getElementById('passwordError').textContent=pv.message;document.getElementById('passwordError').classList.add('show');document.getElementById('userPassword').classList.add('error');hasError=true}
     if(hasError) return;
 
-    // Verify against stored accounts in localStorage
-    const users = JSON.parse(localStorage.getItem('bvrit_users')||'{}');
-    const account = users[username];
-    if(!account){
-        document.getElementById('usernameError').textContent='No account found. Please sign up first.';
-        document.getElementById('usernameError').classList.add('show');document.getElementById('userUsername').classList.add('error');
-        // Auto-show signup suggestion after 2 seconds
-        setTimeout(()=>{
-            const confirmSignup = confirm('Account not found!\n\nWould you like to create a new account?');
-            if(confirmSignup) switchToSignup();
-        }, 1500);
-        return;
-    }
-    if(account.password !== pwd){
-        document.getElementById('passwordError').textContent='Invalid credentials';
-        document.getElementById('passwordError').classList.add('show');document.getElementById('userPassword').classList.add('error');
-        return;
-    }
+    // Call API to login (instead of checking localStorage)
+    loginViaAPI(username, pwd);
+}
 
-    // Successful login
-    const s=document.getElementById('loginSuccess');
-    s.textContent=`Welcome ${username}!`;
-    s.style.background='';
-    s.style.color='';
-    s.classList.add('show');
-    currentUsername = username;
-    localStorage.setItem('bvrit_current_user', username);
-    setTimeout(()=>{ window.location.href = 'order-type.html'; },500);
+async function loginViaAPI(username, pwd) {
+    try {
+        let email = username;
+        
+        // If input doesn't contain @, it's a username - need to get email from API
+        if (!username.includes('@')) {
+            try {
+                const response = await fetch('http://localhost/canteen-api/api/auth/get-email', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username: username })
+                });
+                
+                const data = await response.json();
+                if (!data.success) {
+                    document.getElementById('usernameError').textContent = data.message || 'Username not found';
+                    document.getElementById('usernameError').classList.add('show');
+                    document.getElementById('userUsername').classList.add('error');
+                    return;
+                }
+                email = data.email;
+            } catch (error) {
+                console.error('Error getting email:', error);
+                document.getElementById('usernameError').textContent = 'Error finding user. Please try again.';
+                document.getElementById('usernameError').classList.add('show');
+                return;
+            }
+        }
+        
+        // Call API login endpoint with email
+        const response = await fetch('http://localhost/canteen-api/api/auth/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: email,
+                password: pwd
+            })
+        });
+        
+        const data = await response.json();
+        
+        if(data.success && data.data && data.data.access_token) {
+            // Store token and user info
+            localStorage.setItem('bvrit_access_token', data.data.access_token);
+            localStorage.setItem('bvrit_current_user', data.data.username || username);
+            localStorage.setItem('bvrit_user_id', data.data.serialno || data.data.user_id);
+            
+            console.log('Login successful, stored in localStorage:');
+            console.log('Token:', data.data.access_token.substring(0, 20) + '...');
+            console.log('Current user:', data.data.username);
+            
+            const s=document.getElementById('loginSuccess');
+            s.textContent=`Welcome ${data.data.username || username}!`;
+            s.style.background='';
+            s.style.color='';
+            s.classList.add('show');
+            
+            currentUsername = data.data.username || username;
+            isLoggedIn = true;
+            
+            // Close modal before redirecting
+            closeLoginModal();
+            
+            // Redirect after storage is confirmed with longer delay
+            setTimeout(()=>{ 
+                console.log('Redirecting to order-type.html');
+                window.location.href = 'order-type.html?auth=1&t=' + Date.now(); 
+            }, 1000);
+        } else {
+            document.getElementById('passwordError').textContent = data.message || 'Invalid credentials';
+            document.getElementById('passwordError').classList.add('show');
+            document.getElementById('userPassword').classList.add('error');
+        }
+    } catch(error) {
+        console.error('Login error:', error);
+        document.getElementById('passwordError').textContent = 'Login failed. Please try again.';
+        document.getElementById('passwordError').classList.add('show');
+        document.getElementById('userPassword').classList.add('error');
+    }
 }
 
 // Signup helpers
@@ -257,6 +325,12 @@ function handleSignup(e){
     const email = document.getElementById('signupEmail').value.trim();
     const pwd = document.getElementById('signupPassword').value;
     const confirmPwd = document.getElementById('signupConfirmPassword').value;
+    
+    console.log('=== SIGNUP DEBUG ===');
+    console.log('Username:', username);
+    console.log('Email:', email);
+    console.log('Password:', pwd);
+    
     // clear errors
     const su=document.getElementById('signupUsernameError'); if(su) su.classList.remove('show');
     const se=document.getElementById('signupEmailError'); if(se) se.classList.remove('show');
@@ -265,62 +339,87 @@ function handleSignup(e){
 
     let hasError=false;
     const uv = validateUsername(username);
+    console.log('Username validation:', uv.valid, uv.message);
     if(!uv.valid){document.getElementById('signupUsernameError').textContent=uv.message;document.getElementById('signupUsernameError').classList.add('show');hasError=true}
+    
     const ev = validateEmailStrict(email);
+    console.log('Email validation:', ev.valid, ev.message);
     if(!ev.valid){document.getElementById('signupEmailError').textContent=ev.message;document.getElementById('signupEmailError').classList.add('show');hasError=true}
+    
     const pv = validatePasswordSimple(pwd);
+    console.log('Password validation:', pv.valid, pv.message);
     if(!pv.valid){document.getElementById('signupPasswordError').textContent=pv.message;document.getElementById('signupPasswordError').classList.add('show');hasError=true}
-    if(pwd !== confirmPwd){document.getElementById('signupConfirmPasswordError').textContent='Passwords do not match';document.getElementById('signupConfirmPasswordError').classList.add('show');hasError=true}
+    
+    if(pwd !== confirmPwd){
+        console.log('Password mismatch');
+        document.getElementById('signupConfirmPasswordError').textContent='Passwords do not match';
+        document.getElementById('signupConfirmPasswordError').classList.add('show');
+        hasError=true
+    }
+    
+    console.log('Has error?', hasError);
     if(hasError) return;
 
-    const users = JSON.parse(localStorage.getItem('bvrit_users')||'{}');
-    if(users[username]){
-        document.getElementById('signupUsernameError').textContent='Username already exists';document.getElementById('signupUsernameError').classList.add('show');
-        return;
-    }
-    // Check if email already registered
-    for(const u in users){
-        if(users[u].email === email){
-            document.getElementById('signupEmailError').textContent='This email is already registered';document.getElementById('signupEmailError').classList.add('show');
-            return;
+    // Call API to register user instead of storing in localStorage
+    registerViaAPI(username, email, pwd);
+}
+
+async function registerViaAPI(username, email, password) {
+    try {
+        const response = await fetch('http://localhost/canteen-api/api/auth/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password
+            })
+        });
+        
+        const data = await response.json();
+        console.log('API Response Status:', response.status);
+        console.log('API Response Data:', data);
+        console.log('API Response Errors:', data.errors);
+        
+        if (response.ok && data.success) {
+            // Registration successful
+            if (data.data && data.data.access_token) {
+                localStorage.setItem('bvrit_access_token', data.data.access_token);
+            }
+            if (data.data && data.data.serialno) {
+                localStorage.setItem('bvrit_user_id', data.data.serialno);
+            }
+            localStorage.setItem('bvrit_current_user', username);
+            
+            // Close modal
+            const modal = document.getElementById('signupModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            
+            console.log('Registration successful, redirecting to order-type.html');
+            alert('Signup successful!');
+            setTimeout(() => {
+                window.location.href = 'order-type.html';
+            }, 500);
+        } else if (!response.ok && data.errors) {
+            let errorMsg = 'Signup failed:\n';
+            for (let field in data.errors) {
+                errorMsg += `${field}: ${data.errors[field].join(', ')}\n`;
+            }
+            console.log('Showing error:', errorMsg);
+            alert(errorMsg);
+        } else if (!response.ok && data.message) {
+            console.log('Showing message:', data.message);
+            alert('Error: ' + data.message);
+        } else {
+            console.log('Unknown error');
+            alert('Signup failed. Please try again.');
         }
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('Connection error. Please try again.');
     }
-    
-    // Check canteen operating hours (7am to 8:30pm)
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const isClosedHours = currentHour < 7 || currentHour > 20 || (currentHour === 20 && currentMinute >= 30);
-    
-    // Store user credentials (registration allowed anytime)
-    users[username] = { password: pwd, email: email, registeredDuringClosedHours: isClosedHours };
-    localStorage.setItem('bvrit_users', JSON.stringify(users));
-    
-    const s = document.getElementById('signupSuccess');
-    
-    if(isClosedHours){
-        // Registration successful but don't allow login during closed hours
-        s.textContent = '✅ Account created! However, the canteen is closed (7:00 AM - 8:30 PM). Please login during operating hours to place orders.';
-        s.style.background = '#ff9800';
-        s.style.color = 'white';
-        s.classList.add('show');
-        // Close signup modal after showing message and don't redirect
-        setTimeout(()=>{ 
-            closeSignupModal();
-            s.style.background = '';
-            s.style.color = '';
-        }, 5000);
-        return;
-    }
-    
-    // During open hours - normal flow: auto-login and redirect
-    s.textContent = 'Account created successfully!';
-    s.style.background = '';
-    s.style.color = '';
-    s.classList.add('show');
-    currentUsername = username;
-    localStorage.setItem('bvrit_current_user', username);
-    setTimeout(()=>{ window.location.href = 'order-type.html'; },500);
 }
 
 // Enable cart and buttons after login

@@ -1,0 +1,41 @@
+# Backend - PHP/Laravel
+canteen-api/vendor/
+canteen-api/.env
+canteen-api/.env.local
+canteen-api/.env.*.local
+canteen-api/storage/logs/
+canteen-api/bootstrap/cache/
+canteen-api/storage/framework/cache/
+canteen-api/storage/framework/sessions/
+canteen-api/storage/framework/views/
+canteen-api/.DS_Store
+canteen-api/Thumbs.db
+
+# Frontend
+node_modules/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Generated files
+*.exe
+*.dll
+.env.local
+config.local.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db

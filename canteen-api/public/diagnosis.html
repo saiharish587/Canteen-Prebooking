@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Diagnosis</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .box { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #00bcd4; }
+        .error { border-left-color: #dc2626; }
+        .success { border-left-color: #10b981; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { padding: 8px 16px; background: #00bcd4; color: white; border: none; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Token & API Diagnosis</h1>
+    
+    <div class="box">
+        <h3>📦 Local Storage Check</h3>
+        <pre id="storageCheck"></pre>
+    </div>
+    
+    <div class="box">
+        <h3>🧪 Test API Request</h3>
+        <button onclick="testAPI()">Send Test Request to API</button>
+        <pre id="apiResponse"></pre>
+    </div>
+    
+    <div class="box">
+        <h3>📊 Request Details</h3>
+        <pre id="requestDetails"></pre>
+    </div>
+
+    <script>
+    function checkStorage() {
+        const response = document.getElementById('storageCheck');
+        const token = localStorage.getItem('bvrit_access_token');
+        const user = localStorage.getItem('bvrit_current_user');
+        
+        response.textContent = 'Token exists: ' + (!!token ? '✅ YES' : '❌ NO') + '\n' +
+            'Token length: ' + (token ? token.length : 0) + '\n' +
+            'Token preview: ' + (token ? token.substring(0, 50) + '...' : 'N/A') + '\n' +
+            'Current user: ' + (user || 'N/A') + '\n' +
+            'Full localStorage: \n' +
+            JSON.stringify(Object.fromEntries(Object.entries(localStorage).filter(([k]) => k.startsWith('bvrit_'))), null, 2);
+        
+        if (!token) {
+            response.parentElement.className = 'box error';
+        } else {
+            response.parentElement.className = 'box success';
+        }
+    }
+    
+    async function testAPI() {
+        const token = localStorage.getItem('bvrit_access_token');
+        const detailsDiv = document.getElementById('requestDetails');
+        const responseDiv = document.getElementById('apiResponse');
+        
+        if (!token) {
+            responseDiv.textContent = '❌ No token in localStorage! Login first.';
+            responseDiv.parentElement.className = 'box error';
+            return;
+        }
+        
+        try {
+            responseDiv.textContent = 'Testing... Please wait...';
+            
+            // Log the request details
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Auth-Token': token
+            };
+            
+            detailsDiv.textContent = 'Request Details:\n' +
+                'URL: http://localhost/canteen-api/api/cart\n' +
+                'Method: GET\n' +
+                'Headers: \n' +
+                JSON.stringify(headers, null, 2) + '\n\n' +
+                'Token check:\n' +
+                'Starts with "session_": ' + token.startsWith('session_') + '\n' +
+                'Contains ".": ' + token.includes('.') + '\n' +
+                'Token length: ' + token.length;
+            
+            const response = await fetch('http://localhost/canteen-api/api/cart', {
+                method: 'GET',
+                headers: headers
+            });
+            
+            const data = await response.json();
+            
+            responseDiv.textContent = 'Status: ' + response.status + '\n' +
+                'Response: \n' + JSON.stringify(data, null, 2);
+            
+            if (response.ok) {
+                responseDiv.parentElement.className = 'box success';
+            } else {
+                responseDiv.parentElement.className = 'box error';
+            }
+        } catch(error) {
+            responseDiv.textContent = '❌ Error:\n' + error.message + '\n\n' + error.stack;
+            responseDiv.parentElement.className = 'box error';
+        }
+    }
+    
+    // Check storage on load
+    window.addEventListener('load', checkStorage);
+    </script>
+</body>
+</html>

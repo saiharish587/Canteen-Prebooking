@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS Setup Guide - BVRIT Canteen</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .section {
+            background: #252525;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            background: #3498db;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            margin: 0 0 10px 0;
+            color: #fff;
+        }
+
+        .step-content p {
+            margin: 5px 0;
+            color: #bbb;
+        }
+
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ffb6c1;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #90ee90;
+        }
+
+        .warning {
+            background: #3d2a1a;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .warning strong {
+            color: #f39c12;
+        }
+
+        .success {
+            background: #1a3a2a;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .success strong {
+            color: #27ae60;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px 5px 10px 0;
+        }
+
+        .link-button:hover {
+            background: #2980b9;
+        }
+
+        .error-section {
+            background: #3d1f1a;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .error-section strong {
+            color: #e74c3c;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #bbb;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .troubleshoot-item {
+            margin-bottom: 15px;
+        }
+
+        .troubleshoot-item strong {
+            color: #f39c12;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍳 Kitchen Display System - Setup Guide</h1>
+
+        <div class="section">
+            <h2>Quick Start (5 minutes)</h2>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Access KDS Interface</h3>
+                    <p>Open your browser and go to:</p>
+                    <div class="code-block">http://localhost/canteen/kds.html</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Get Admin API Token</h3>
+                    <p>You need to login with admin credentials to get a token. Use the API endpoint:</p>
+                    <div class="code-block">POST http://localhost/canteen-api/api/auth/login</div>
+                    <p>Request body:</p>
+                    <div class="code-block">{
+  "email": "admin@bvrit.ac.in",
+  "password": "AdminPassword123"
+}</div>
+                    <p>Use a tool like <strong>Postman</strong> or <strong>cURL</strong> to make this request.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Copy the Token</h3>
+                    <p>From the login response, copy the <code>access_token</code> value. It will look like:</p>
+                    <div class="code-block">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ...</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Paste Token in Settings</h3>
+                    <p>In the KDS page:</p>
+                    <ul class="feature-list">
+                        <li>Click ⚙️ Settings button</li>
+                        <li>Paste the token in the "API Token" field</li>
+                        <li>Click "Test Token" to verify it works</li>
+                        <li>Click "Save Settings"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Start Using KDS</h3>
+                    <p>Once orders appear:</p>
+                    <ul class="feature-list">
+                        <li>Pending orders show with yellow border</li>
+                        <li>Click "✅ CONFIRM" to accept order</li>
+                        <li>Click "👨‍🍳 PREPARING" when you start cooking</li>
+                        <li>Click "✨ READY" when order is ready</li>
+                        <li>Click "🎉 COMPLETED" when customer collects order</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Using cURL to Get Token (Terminal/Command Prompt)</h2>
+            
+            <p>On Windows (PowerShell):</p>
+            <div class="code-block">$body = @{
+  email = "admin@bvrit.ac.in"
+  password = "AdminPassword123"
+} | ConvertTo-Json
+
+$response = Invoke-RestMethod -Uri "http://localhost/canteen-api/api/auth/login" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body $body
+
+$response.data.access_token</div>
+
+            <p>On Linux/Mac (Bash):</p>
+            <div class="code-block">curl -X POST http://localhost/canteen-api/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@bvrit.ac.in",
+    "password": "AdminPassword123"
+  }'</div>
+        </div>
+
+        <div class="section">
+            <h2>Troubleshooting</h2>
+
+            <div class="troubleshoot-item">
+                <strong>Error: "Disconnected" or Red status badge</strong>
+                <p>The API is not responding. Check:</p>
+                <ul class="feature-list">
+                    <li>Is the Laravel server running? Check <code>http://localhost/canteen-api/api/health</code></li>
+                    <li>Is Apache/XAMPP running?</li>
+                    <li>Check PHP error logs in XAMPP</li>
+                </ul>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>Error: "Unable to load orders. Check connection and token."</strong>
+                <p>The token might be invalid or permissions are limited. Try:</p>
+                <ul class="feature-list">
+                    <li>Click Settings (⚙️) and test the token again</li>
+                    <li>Make sure you're using an ADMIN account token</li>
+                    <li>Login again to get a fresh token</li>
+                    <li>Check if there are pending orders in the database</li>
+                </ul>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>Error: "Connection error: Invalid token format"</strong>
+                <p>The token format is incorrect:</p>
+                <ul class="feature-list">
+                    <li>Copy the entire <code>access_token</code> value from login response</li>
+                    <li>Don't include quotes or extra spaces</li>
+                    <li>Token should start with "eyJ"</li>
+                </ul>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>No orders showing even after token is set</strong>
+                <p>Check these possibilities:</p>
+                <ul class="feature-list">
+                    <li>Are there any orders in the database with "pending" status?</li>
+                    <li>Create a test order first using the API</li>
+                    <li>Check if the database connection is working</li>
+                    <li>View the debug logs at bottom-left of KDS page</li>
+                </ul>
+            </div>
+
+            <div class="troubleshoot-item">
+                <strong>Sound alerts not working</strong>
+                <p>Try these fixes:</p>
+                <ul class="feature-list">
+                    <li>Enable "Sound Alerts" in Settings (should be checked)</li>
+                    <li>Check browser volume is not muted</li>
+                    <li>Some browsers block audio - allow audio in browser permissions</li>
+                    <li>Try a different browser (Chrome works best)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Admin Login Credentials</h2>
+
+            <p>To create orders and test the system:</p>
+            <div class="code-block">Email: admin@bvrit.ac.in
+Password: AdminPassword123</div>
+
+            <div class="warning">
+                <strong>⚠️ Note:</strong> Change these credentials in production! These are default test credentials.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Features Overview</h2>
+
+            <div class="success">
+                <strong>✅ Real-time Order Display</strong>
+                <p>Orders update automatically every 10 seconds (configurable in settings)</p>
+            </div>
+
+            <div class="success">
+                <strong>✅ One-Click Status Updates</strong>
+                <p>Advance orders through workflow: Pending → Confirmed → Preparing → Ready → Completed</p>
+            </div>
+
+            <div class="success">
+                <strong>✅ Sound Alerts</strong>
+                <p>Notification beep when orders arrive, special alert when order is ready</p>
+            </div>
+
+            <div class="success">
+                <strong>✅ Filter Options</strong>
+                <p>View all orders or filter by status (Pending, Confirmed, Preparing, Ready)</p>
+            </div>
+
+            <div class="success">
+                <strong>✅ Live Statistics</strong>
+                <p>See count of orders at each stage at a glance</p>
+            </div>
+
+            <div class="success">
+                <strong>✅ Mobile Responsive</strong>
+                <p>Works on tablets and touch devices for flexible kitchen setup</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>API Endpoints Used</h2>
+
+            <div class="code-block">GET  /api/health                    - Check API status
+GET  /api/auth/login              - Login to get token
+GET  /api/admin/orders/pending    - Get pending orders
+PUT  /api/admin/orders/{id}/status - Update order status</div>
+        </div>
+
+        <div class="section">
+            <h2>Environment Info</h2>
+
+            <ul class="feature-list">
+                <li>KDS URL: <code>http://localhost/canteen/kds.html</code></li>
+                <li>API Base: <code>http://localhost/canteen-api/api</code></li>
+                <li>Database: bvrit_canteen (users, menu_items, orders, etc.)</li>
+                <li>Framework: Laravel (PHP backend)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <a href="kds.html" class="link-button">← Back to KDS</a>
+        </div>
+
+        <div class="footer">
+            <p>Kitchen Display System for BVRIT Canteen Management</p>
+            <p>Last Updated: March 2026</p>
+        </div>
+    </div>
+</body>
+</html>
