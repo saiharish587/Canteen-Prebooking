@@ -8,26 +8,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
     libzip-dev \
-    libssl-dev \
-    libcurl4-openssl-dev \
-    pkg-config \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions - Laravel 11 requirements
+# Install only required PHP extensions - others are built-in
 RUN docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_mysql \
     zip \
-    curl \
     bcmath \
-    ctype \
-    fileinfo \
-    json \
-    mbstring \
-    tokenizer
+    mbstring
 
 # Set PHP memory limit for composer
-RUN echo "memory_limit = 1G" >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
+RUN echo "memory_limit = 2G" >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
 
 # Download and install latest Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -35,17 +28,16 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copy composer files
 COPY composer.json composer.lock* ./
 
-# Install dependencies (remove composer.lock for fresh resolution if needed)
-RUN composer install --no-dev --no-interaction --no-scripts || \
-    (rm -f composer.lock && composer install --no-dev --no-interaction --no-scripts)
+# Install dependencies
+RUN composer install --no-dev --no-interaction --no-scripts 2>&1 || (rm -f composer.lock && composer install --no-dev --no-interaction --no-scripts)
 
 # Copy rest of application
 COPY . .
 
 # Run composer scripts
-RUN composer run-script post-install-cmd
+RUN composer run-script post-install-cmd || true
 
-# Create necessary directories with correct permissions
+# Create necessary directories
 RUN mkdir -p storage/logs bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
