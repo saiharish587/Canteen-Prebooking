@@ -163,10 +163,7 @@ function validateAdminEmail(email){
 function handleLogin(e){
     e.preventDefault(); clearErrors();
     
-    // Check canteen operating hours (7am to 9pm) - skip for admins
-    const now = new Date();
-    const currentHour = now.getHours();
-    
+    // Note: Operating hours are validated server-side, not blocking client-side during dev/testing
     const username = document.getElementById('userUsername').value.trim();
     const pwd = document.getElementById('userPassword').value;
     
@@ -182,17 +179,6 @@ function handleLogin(e){
         localStorage.setItem('bvrit_current_user', 'admin');
         localStorage.setItem('bvrit_is_admin', 'true');
         setTimeout(()=>{ window.location.href = 'admin.html'; },500);
-        return;
-    }
-    
-    // For regular users, check closing hours
-    if(currentHour < 7 || currentHour > 20 || (currentHour === 20 && new Date().getMinutes() >= 30)){
-        const s=document.getElementById('loginSuccess');
-        s.textContent='🚫 Our canteen is closed! Operating hours: 7:00 AM - 8:30 PM. Please order tomorrow.';
-        s.style.background='#dc2626';
-        s.style.color='white';
-        s.classList.add('show');
-        setTimeout(()=>{ s.classList.remove('show'); s.style.background=''; s.style.color=''; },20000);
         return;
     }
     
@@ -547,19 +533,8 @@ function enableCartAndButtons(){
 
 // Handle Order Now button click
 function handleOrderNow(){
-    // Allow admins to bypass closing hours
-    if(isAdmin) {
-        document.getElementById('menuGrid').scrollIntoView({behavior:'smooth'});
-        return;
-    }
-    // Check if canteen is closed for regular users
-    const now = new Date();
-    const currentHour = now.getHours();
-    if(currentHour < 7 || currentHour >= 21){
-        // Show closed message modal
-        document.getElementById('closedModal').classList.add('show');
-        return;
-    }
+    // Development mode: Remove operating hours check for testing
+    // Note: Operating hours validation happens server-side
     
     if(!isLoggedIn){
         openLoginModal();
