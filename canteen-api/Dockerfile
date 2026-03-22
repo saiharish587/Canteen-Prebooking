@@ -8,17 +8,17 @@ RUN apk add --no-cache \
     git \
     zip \
     unzip \
+    openssl-dev \
     oniguruma-dev \
     libzip-dev \
-    $PHPIZE_DEPS
-
-# Install PHP extensions
-RUN docker-php-ext-install \
+    $PHPIZE_DEPS && \
+    docker-php-ext-install \
     pdo \
     pdo_mysql \
     zip \
     bcmath \
-    mbstring
+    mbstring && \
+    apk del $PHPIZE_DEPS
 
 # Set memory limit
 RUN echo "memory_limit=2G" > /usr/local/etc/php/conf.d/memory.ini
@@ -26,14 +26,20 @@ RUN echo "memory_limit=2G" > /usr/local/etc/php/conf.d/memory.ini
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy and install dependencies
+# Copy application
 COPY . .
-RUN rm -f composer.lock && \
-    COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction
+
+# Create startup script
+RUN echo '#!/bin/sh\n\
+cd /app\n\
+composer install --no-dev --no-interaction 2>&1\n\
+php artisan migrate --force 2>&1\n\
+php artisan serve --host=0.0.0.0 --port=8000' > /start.sh && \
+chmod +x /start.sh
 
 # Fix permissions
 RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["/start.sh"]
