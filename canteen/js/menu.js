@@ -1,4 +1,4 @@
-// Check if user is logged in - with delay to ensure localStorage is set
+// Check if user is logged in - with longer delay to ensure localStorage is set
 let currentUser = null; // Define globally
 
 setTimeout(function() {
@@ -34,7 +34,7 @@ setTimeout(function() {
         initUserGreeting();
         document.body.style.opacity = '1';
     }
-}, 100);
+}, 500);
 
 // Initialize user greeting
 function initUserGreeting(){
