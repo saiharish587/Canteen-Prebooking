@@ -4,7 +4,17 @@
  * BVRIT Canteen Frontend
  */
 
-const API_URL = 'http://localhost/canteen-api/api';
+// Get API URL based on environment
+function getAPIURL() {
+    // Development: Use localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost/canteen-api/api';
+    }
+    // Production: Use Render backend
+    return 'https://canteen-prebooking.onrender.com/api';
+}
+
+const API_URL = getAPIURL();
 
 class APIService {
     constructor() {

@@ -4,7 +4,7 @@
 // Dynamically determine API URL based on current domain
 function getAPIBaseURL() {
     // For development: http://localhost/canteen-api/api
-    // For production: https://your-domain.com/api or https://your-api-domain.com/api
+    // For production: https://canteen-prebooking.onrender.com/api
     
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
@@ -15,18 +15,8 @@ function getAPIBaseURL() {
         return `${protocol}//${hostname}${port}/canteen-api/api`;
     }
     
-    // For production deployments
-    // Option 1: API on same domain
-    // return `${protocol}//${hostname}${port}/api`;
-    
-    // Option 2: API on subdomain or separate domain
-    // return `${protocol}//api.${hostname}${port}/api`;
-    
-    // Option 3: API on different domain (set via environment/config)
-    // return window.CONFIG_API_URL || `${protocol}//api.${hostname}${port}/api`;
-    
-    // Default to same domain /api
-    return `${protocol}//${hostname}${port}/api`;
+    // For production deployments - use Render backend
+    return 'https://canteen-prebooking.onrender.com/api';
 }
 
 const CONFIG = {
