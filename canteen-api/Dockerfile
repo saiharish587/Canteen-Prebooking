@@ -7,22 +7,30 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
     unzip \
+    libzip-dev \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql zip
+
+# Set PHP memory limit for composer
+RUN echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
 
 # Download and install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy project files
+# Copy composer files first
+COPY composer.json composer.lock* ./
+
+# Install composer dependencies with fallback
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader || composer install --no-dev --no-interaction --prefer-dist
+
+# Copy rest of project files
 COPY . .
 
-# Install composer dependencies
-RUN composer install --no-dev --optimize-autoloader
-
 # Set permissions
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache || true
+RUN chmod -R 775 /app/storage /app/bootstrap/cache || true
 
 # Expose port
 EXPOSE 8000
