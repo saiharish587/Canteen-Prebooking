@@ -30,6 +30,7 @@ function checkAuthAndInit() {
     // Otherwise, require both token and user
     if(!currentUser || !accessToken){
         console.error('❌ Auth FAILED - no credentials');
+        console.log('DEBUG: currentUser =', currentUser, ', accessToken =', accessToken);
         localStorage.removeItem('bvrit_current_user');
         localStorage.removeItem('bvrit_access_token');
         alert('Please login to proceed.');
@@ -41,8 +42,8 @@ function checkAuthAndInit() {
     }
 }
 
-// Call immediately
-checkAuthAndInit();
+// Call with longer delay (500ms) to ensure localStorage is synced after redirect
+setTimeout(checkAuthAndInit, 500);
 
 // Initialize greeting
 function initGreeting(){
