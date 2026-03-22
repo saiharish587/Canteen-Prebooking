@@ -219,10 +219,15 @@ async function loginViaAPI(username, pwd) {
     try {
         let email = username;
         
+        // Get correct API URL
+        const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost/canteen-api/api' 
+            : 'https://canteen-prebooking.onrender.com/api';
+        
         // If input doesn't contain @, it's a username - need to get email from API
         if (!username.includes('@')) {
             try {
-                const response = await fetch('http://localhost/canteen-api/api/auth/get-email', {
+                const response = await fetch(`${apiUrl}/auth/get-email`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ username: username })
@@ -245,7 +250,7 @@ async function loginViaAPI(username, pwd) {
         }
         
         // Call API login endpoint with email
-        const response = await fetch('http://localhost/canteen-api/api/auth/login', {
+        const response = await fetch(`${apiUrl}/auth/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -256,15 +261,18 @@ async function loginViaAPI(username, pwd) {
         
         const data = await response.json();
         
+        console.log('Login API response:', data);
+        
         if(data.success && data.data && data.data.access_token) {
             // Store token and user info
             localStorage.setItem('bvrit_access_token', data.data.access_token);
             localStorage.setItem('bvrit_current_user', data.data.username || username);
             localStorage.setItem('bvrit_user_id', data.data.serialno || data.data.user_id);
             
-            console.log('Login successful, stored in localStorage:');
+            console.log('✅ Login successful, stored in localStorage:');
             console.log('Token:', data.data.access_token.substring(0, 20) + '...');
             console.log('Current user:', data.data.username);
+            console.log('User ID:', data.data.serialno || data.data.user_id);
             
             const s=document.getElementById('loginSuccess');
             s.textContent=`Welcome ${data.data.username || username}!`;
@@ -280,16 +288,17 @@ async function loginViaAPI(username, pwd) {
             
             // Redirect after storage is confirmed with longer delay
             setTimeout(()=>{ 
-                console.log('Redirecting to order-type.html');
+                console.log('✅ Redirecting to order-type.html');
                 window.location.href = 'order-type.html?auth=1&t=' + Date.now(); 
             }, 1000);
         } else {
+            console.error('❌ Login failed:', data.message);
             document.getElementById('passwordError').textContent = data.message || 'Invalid credentials';
             document.getElementById('passwordError').classList.add('show');
             document.getElementById('userPassword').classList.add('error');
         }
     } catch(error) {
-        console.error('Login error:', error);
+        console.error('❌ Login error:', error);
         document.getElementById('passwordError').textContent = 'Login failed. Please try again.';
         document.getElementById('passwordError').classList.add('show');
         document.getElementById('userPassword').classList.add('error');
@@ -366,7 +375,12 @@ function handleSignup(e){
 
 async function registerViaAPI(username, email, password) {
     try {
-        const response = await fetch('http://localhost/canteen-api/api/auth/register', {
+        // Detect API URL based on environment
+        const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost/canteen-api/api' 
+            : 'https://canteen-prebooking.onrender.com/api';
+        
+        const response = await fetch(`${apiUrl}/auth/register`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

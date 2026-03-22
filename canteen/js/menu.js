@@ -99,6 +99,15 @@ function loadMenuItemsFromAdmin(){
 
 
 
+// ==================== API URL Helper ====================
+function getAPIURL() {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost/canteen-api/api';
+    }
+    return 'https://canteen-prebooking.onrender.com/api';
+}
+
 // Category Filter
 function filterCategory(category){
     document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
@@ -142,7 +151,8 @@ async function addToCart(btn){
         if(!finalItemId) {
             console.log('Looking up menu item:', itemName);
             // Make a simple fetch to get menu items and find the ID
-            const response = await fetch('http://localhost/canteen-api/api/menu', {
+            const apiUrl = getAPIURL();
+            const response = await fetch(`${apiUrl}/menu`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -172,13 +182,14 @@ async function addToCart(btn){
         if(!service) {
             console.error('API Service not initialized - using fallback fetch');
             // Fallback to direct API call
+            const apiUrl = getAPIURL();
             console.log('Sending request with:');
-            console.log('  URL: http://localhost/canteen-api/api/cart/add');
+            console.log('  URL:', `${apiUrl}/cart/add`);
             console.log('  Method: POST');
             console.log('  Headers: Authorization Bearer + X-Auth-Token');
             console.log('  Token:', token.substring(0, 40) + '...');
             
-            const response = await fetch('http://localhost/canteen-api/api/cart/add', {
+            const response = await fetch(`${apiUrl}/cart/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -449,8 +460,9 @@ async function loadCartFromAPI(){
     }
     
     try {
+        const apiUrl = getAPIURL();
         console.log('Loading cart from API with token:', token.substring(0, 30) + '...');
-        const response = await fetch('http://localhost/canteen-api/api/cart', {
+        const response = await fetch(`${apiUrl}/cart`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -506,7 +518,8 @@ async function viewOrderHistory() {
         }
         
         // Fetch orders list
-        const response = await fetch('http://localhost/canteen-api/api/orders', {
+        const apiUrl = getAPIURL();
+        const response = await fetch(`${apiUrl}/orders`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -551,7 +564,8 @@ async function viewOrderHistory() {
 
 async function fetchOrderDetails(token, orderId) {
     try {
-        const response = await fetch(`http://localhost/canteen-api/api/orders/${orderId}`, {
+        const apiUrl = getAPIURL();
+        const response = await fetch(`${apiUrl}/orders/${orderId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

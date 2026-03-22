@@ -135,7 +135,11 @@ class KitchenDisplaySystem {
         btn.textContent = 'Logging in...';
 
         try {
-            const response = await fetch('http://localhost/canteen-api/api/auth/login', {
+            const baseURL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost/canteen-api/api'
+                : 'https://canteen-prebooking.onrender.com/api';
+            
+            const response = await fetch(`${baseURL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
