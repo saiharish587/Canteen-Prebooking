@@ -218,39 +218,61 @@ function handleLogin(e){
 async function loginViaAPI(username, pwd) {
     try {
         let email = username;
+        console.log('🔐 [LOGIN START] Username/Email:', username);
         
         // Get correct API URL
         const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? 'http://localhost/canteen-api/api' 
             : 'https://canteen-prebooking.onrender.com/api';
         
+        console.log('🔐 [API URL] Using:', apiUrl);
+        
         // If input doesn't contain @, it's a username - need to get email from API
         if (!username.includes('@')) {
+            console.log('🔐 [METHOD] Username provided - fetching email from API');
             try {
-                const response = await fetch(`${apiUrl}/auth/get-email`, {
+                const getEmailUrl = `${apiUrl}/auth/get-email`;
+                console.log('🔐 [GET-EMAIL] Calling:', getEmailUrl);
+                
+                const response = await fetch(getEmailUrl, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ username: username })
                 });
                 
+                console.log('🔐 [GET-EMAIL RESPONSE]', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                
                 const data = await response.json();
+                console.log('🔐 [GET-EMAIL DATA]', data);
+                
                 if (!data.success) {
+                    console.error('❌ [GET-EMAIL FAILED]', data.message);
                     document.getElementById('usernameError').textContent = data.message || 'Username not found';
                     document.getElementById('usernameError').classList.add('show');
                     document.getElementById('userUsername').classList.add('error');
                     return;
                 }
                 email = data.email;
+                console.log('✅ [GET-EMAIL SUCCESS] Email:', email);
             } catch (error) {
-                console.error('Error getting email:', error);
-                document.getElementById('usernameError').textContent = 'Error finding user. Please try again.';
+                console.error('❌ [GET-EMAIL ERROR]', error);
+                document.getElementById('usernameError').textContent = 'Network error. Please check your connection.';
                 document.getElementById('usernameError').classList.add('show');
                 return;
             }
+        } else {
+            console.log('🔐 [METHOD] Email provided directly');
         }
         
         // Call API login endpoint with email
-        const response = await fetch(`${apiUrl}/auth/login`, {
+        const loginUrl = `${apiUrl}/auth/login`;
+        console.log('🔐 [LOGIN REQUEST]', {url: loginUrl, email: email, passwordLength: pwd.length});
+        
+        const response = await fetch(loginUrl, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -259,15 +281,40 @@ async function loginViaAPI(username, pwd) {
             })
         });
         
+        console.log('🔐 [LOGIN RESPONSE]', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+            headers: {
+                'content-type': response.headers.get('content-type'),
+                'access-control-allow-origin': response.headers.get('access-control-allow-origin')
+            }
+        });
+        
         const data = await response.json();
         
-        console.log('Login API response:', data);
+        console.log('🔐 [LOGIN DATA]', {
+            success: data.success,
+            message: data.message,
+            hasData: !!data.data,
+            hasToken: !!(data.data && data.data.access_token),
+            tokenLength: data.data && data.data.access_token ? data.data.access_token.length : 0,
+            username: data.data && data.data.username,
+            serialno: data.data && data.data.serialno
+        });
         
         if(data.success && data.data && data.data.access_token) {
+            console.log('✅ [LOGIN SUCCESS] Valid token received');
+            
             // Store token and user info
             localStorage.setItem('bvrit_access_token', data.data.access_token);
             localStorage.setItem('bvrit_current_user', data.data.username || username);
             localStorage.setItem('bvrit_user_id', data.data.serialno || data.data.user_id);
+            
+            console.log('✅ [STORAGE SUCCESS] Items stored in localStorage');
+            console.log('  - Token length:', data.data.access_token.length);
+            console.log('  - Username:', data.data.username);
+            console.log('  - User ID:', data.data.serialno || data.data.user_id);
             
             console.log('✅ Login successful, stored in localStorage:');
             console.log('Token:', data.data.access_token.substring(0, 20) + '...');
@@ -292,14 +339,39 @@ async function loginViaAPI(username, pwd) {
                 window.location.href = 'order-type.html?auth=1&t=' + Date.now(); 
             }, 1000);
         } else {
-            console.error('❌ Login failed:', data.message);
-            document.getElementById('passwordError').textContent = data.message || 'Invalid credentials';
+            console.error('❌ [LOGIN FAILED]', {
+                success: data.success,
+                message: data.message,
+                dataExists: !!data.data,  tokenExists: data.data && !!data.data.access_token
+            });
+            
+            let displayMsg = data.message || 'Invalid credentials';
+            if (!data.success) {
+                displayMsg = data.message || 'Login failed. Please check your credentials.';
+            } else if (!data.data || !data.data.access_token) {
+                displayMsg = 'Server error: Token missing. Please try again.';
+                console.error('❌ [MISSING TOKEN]', 'Server returned success but no token in data');
+            }
+            
+            document.getElementById('passwordError').textContent = displayMsg;
             document.getElementById('passwordError').classList.add('show');
             document.getElementById('userPassword').classList.add('error');
         }
     } catch(error) {
-        console.error('❌ Login error:', error);
-        document.getElementById('passwordError').textContent = 'Login failed. Please try again.';
+        console.error('❌ [CATCH ERROR]', {
+            type: error.name,
+            message: error.message,
+            stack: error.stack.substring(0, 200)
+        });
+        
+        let displayMsg = 'Login failed. Please try again.';
+        if (error.message.includes('fetch')) {
+            displayMsg = 'Network error. Please check your internet connection.';
+        } else if (error.message.includes('JSON')) {
+            displayMsg = 'Server returned invalid response. Please try again.';
+        }
+        
+        document.getElementById('passwordError').textContent = displayMsg;
         document.getElementById('passwordError').classList.add('show');
         document.getElementById('userPassword').classList.add('error');
     }
