@@ -29,17 +29,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy application
 COPY . .
 
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 # Create directories and fix permissions
 RUN mkdir -p storage/logs bootstrap/cache && \
     chmod -R 777 storage bootstrap/cache
-
-# Create startup script
-RUN echo '#!/bin/sh\n\
-cd /app\n\
-composer install --no-dev --no-interaction 2>&1\n\
-php artisan migrate --force 2>&1\n\
-php artisan serve --host=0.0.0.0 --port=8000' > /start.sh && \
-chmod +x /start.sh
 
 EXPOSE 8000
 
