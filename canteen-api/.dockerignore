@@ -1,0 +1,12 @@
+.git
+.github
+.gitignore
+node_modules
+npm-debug.log
+yarn-error.log
+.env.local
+.env.*.local
+/storage
+/bootstrap/cache
+.DS_Store
+Thumbs.db
