@@ -10,8 +10,8 @@ APP_KEY=base64:7pIskuZ2q1q5DGYDBn/PlYo3mhEUg3H6Ty8dP4Y/hbg=
 APP_URL=https://canteen-api.onrender.com
 
 DB_CONNECTION=mysql
-DB_HOST=mysql.railway.internal
-DB_PORT=3306
+DB_HOST=yamabiko.proxy.rlwy.net
+DB_PORT=20015
 DB_DATABASE=railway
 DB_USERNAME=root
 DB_PASSWORD=OJvKSKpyqipJOsoeKyzHRVQVrbysCuON
