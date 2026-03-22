@@ -311,15 +311,17 @@ async function loginViaAPI(username, pwd) {
             localStorage.setItem('bvrit_current_user', data.data.username || username);
             localStorage.setItem('bvrit_user_id', data.data.serialno || data.data.user_id);
             
+            // Store user type for role-based redirects
+            if (data.data.user_type) {
+                localStorage.setItem('bvrit_user_type', data.data.user_type);
+                localStorage.setItem('bvrit_is_admin', data.data.user_type === 'admin' ? 'true' : 'false');
+            }
+            
             console.log('✅ [STORAGE SUCCESS] Items stored in localStorage');
             console.log('  - Token length:', data.data.access_token.length);
             console.log('  - Username:', data.data.username);
             console.log('  - User ID:', data.data.serialno || data.data.user_id);
-            
-            console.log('✅ Login successful, stored in localStorage:');
-            console.log('Token:', data.data.access_token.substring(0, 20) + '...');
-            console.log('Current user:', data.data.username);
-            console.log('User ID:', data.data.serialno || data.data.user_id);
+            console.log('  - User Type:', data.data.user_type);
             
             const s=document.getElementById('loginSuccess');
             s.textContent=`Welcome ${data.data.username || username}!`;
@@ -333,10 +335,19 @@ async function loginViaAPI(username, pwd) {
             // Close modal before redirecting
             closeLoginModal();
             
+            // Determine redirect based on user type
+            let redirectUrl = 'order-type.html?auth=1&t=' + Date.now();
+            if (data.data.user_type === 'admin') {
+                redirectUrl = 'admin.html';
+                console.log('✅ [ADMIN LOGIN] Redirecting to admin panel');
+            } else {
+                console.log('✅ [USER LOGIN] Redirecting to order type selection');
+            }
+            
             // Redirect after storage is confirmed with longer delay
             setTimeout(()=>{ 
-                console.log('✅ Redirecting to order-type.html');
-                window.location.href = 'order-type.html?auth=1&t=' + Date.now(); 
+                console.log('✅ Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl; 
             }, 1000);
         } else {
             console.error('❌ [LOGIN FAILED]', {
@@ -477,16 +488,30 @@ async function registerViaAPI(username, email, password) {
             }
             localStorage.setItem('bvrit_current_user', username);
             
+            // Store user type for role-based redirects
+            if (data.data && data.data.user_type) {
+                localStorage.setItem('bvrit_user_type', data.data.user_type);
+                localStorage.setItem('bvrit_is_admin', data.data.user_type === 'admin' ? 'true' : 'false');
+            }
+            
             // Close modal
             const modal = document.getElementById('signupModal');
             if (modal) {
                 modal.style.display = 'none';
             }
             
-            console.log('Registration successful, redirecting to order-type.html');
+            console.log('Registration successful');
             alert('Signup successful!');
+            
+            // Determine redirect based on user type
+            let redirectUrl = 'order-type.html';
+            if (data.data && data.data.user_type === 'admin') {
+                redirectUrl = 'admin.html';
+                console.log('Admin registration - redirecting to admin panel');
+            }
+            
             setTimeout(() => {
-                window.location.href = 'order-type.html';
+                window.location.href = redirectUrl;
             }, 500);
         } else if (!response.ok && data.errors) {
             let errorMsg = 'Signup failed:\n';
