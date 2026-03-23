@@ -8,29 +8,12 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\AdminController;
 
-// Root route - accessible at /
-Route::get('/', function () {
-    return response()->json(['message' => 'Canteen API Server', 'status' => 'operational']);
+// Public Auth Routes
+Route::prefix('auth')->group(function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('get-email', [AuthController::class, 'getEmailByUsername']);
 });
-
-// Test route - accessible at /test  
-Route::get('/test', function () {
-    return response()->json(['test' => 'API routes loaded successfully']);
-});
-
-// Health check endpoint - accessible at /health
-Route::get('/health', function () {
-    return response()->json(['status' => 'API is running']);
-});
-
-// API routes under /api prefix
-Route::prefix('api')->group(function () {
-    // Public Auth Routes
-    Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('get-email', [AuthController::class, 'getEmailByUsername']);
-    });
 
     // Public Menu Routes
     Route::prefix('menu')->group(function () {
@@ -97,4 +80,4 @@ Route::prefix('api')->group(function () {
             Route::put('/{orderId}/status', [AdminController::class, 'updateOrderStatus']);
         });
     });
-});
+
