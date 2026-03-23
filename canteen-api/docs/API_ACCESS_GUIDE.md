@@ -52,7 +52,7 @@ Content-Type: application/json
 |------|-------|----------|
 | **Student** | `21bd001@bvrit.ac.in` | `password123` |
 | **Faculty** | `faculty@bvrit.ac.in` | `faculty@123` |
-| **Admin** | `admin@bvrit.ac.in` | `admin@123` |
+| **Admin** | `admin@bvrit.ac.in` | `Admin@123` |
 
 ---
 

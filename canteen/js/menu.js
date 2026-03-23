@@ -4,6 +4,7 @@ let currentUser = null; // Define globally
 setTimeout(function() {
     currentUser = localStorage.getItem('bvrit_current_user');
     const accessToken = localStorage.getItem('bvrit_access_token');
+    const userType = localStorage.getItem('bvrit_user_type');
     const isAdmin = localStorage.getItem('bvrit_is_admin') === 'true';
     const urlParams = new URLSearchParams(window.location.search);
     const isFromLogin = urlParams.get('auth') === '1';
@@ -11,28 +12,39 @@ setTimeout(function() {
     console.log('menu.js - Auth check:');
     console.log('currentUser:', currentUser);
     console.log('accessToken exists?:', !!accessToken);
+    console.log('userType:', userType);
     console.log('isAdmin:', isAdmin);
     console.log('fromLogin URL param?:', isFromLogin);
 
-    // If coming from login or admin, allow access
-    if(isFromLogin || isAdmin) {
-        console.log('✅ Auth PASSED');
+    // If coming from login, allow access
+    if(isFromLogin) {
+        console.log('✅ Auth PASSED - from login redirect');
+        initUserGreeting();
+        document.body.style.opacity = '1';
+        return;
+    }
+
+    // If admin, allow access
+    if(isAdmin || userType === 'admin') {
+        console.log('✅ Auth PASSED - admin access');
         initUserGreeting();
         document.body.style.opacity = '1';
         return;
     }
 
     // Otherwise require full credentials
-    if(!currentUser || !accessToken){
+    if(currentUser && accessToken) {
+        console.log('✅ Auth PASSED - valid credentials');
+        initUserGreeting();
+        document.body.style.opacity = '1';
+    } else {
         console.error('Auth check FAILED');
         localStorage.removeItem('bvrit_current_user');
         localStorage.removeItem('bvrit_access_token');
+        localStorage.removeItem('bvrit_user_type');
+        localStorage.removeItem('bvrit_is_admin');
         alert('Please login to access the menu.');
         window.location.href = 'index.html';
-    } else {
-        console.log('✅ Auth PASSED');
-        initUserGreeting();
-        document.body.style.opacity = '1';
     }
 }, 500);
 

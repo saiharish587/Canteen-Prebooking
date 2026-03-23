@@ -5,7 +5,7 @@ These test users have been automatically created in the database via the UserSee
 ## Admin User
 - **Email:** `admin@bvrit.ac.in`
 - **Username:** `admin`
-- **Password:** `admin@123`
+- **Password:** `Admin@123`
 - **Role:** Admin (Can access KDS - Kitchen Display System)
 
 ## Student User
@@ -25,13 +25,13 @@ These test users have been automatically created in the database via the UserSee
 ### Using Email:
 ```
 Email/Username: admin@bvrit.ac.in
-Password: admin@123
+Password: Admin@123
 ```
 
 ### Using Username:
 ```
 Email/Username: admin
-Password: admin@123
+Password: Admin@123
 ```
 
 ## Debugging Steps
