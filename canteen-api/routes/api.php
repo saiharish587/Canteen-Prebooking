@@ -8,6 +8,11 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\AdminController;
 
+// Root route - at the very top before any grouping
+Route::get('/', function () {
+    return response()->json(['message' => 'Canteen API Server', 'status' => 'operational']);
+});
+
 // Public Auth Routes
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -81,3 +86,7 @@ Route::prefix('auth')->group(function () {
         });
     });
 
+// Catch-all fallback for undefined routes
+Route::fallback(function () {
+    return response()->json(['error' => 'Endpoint not found'], 404);
+});
