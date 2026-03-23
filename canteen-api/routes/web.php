@@ -2,33 +2,42 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Health check endpoint
-Route::get('/health', function () {
-    return response()->json(['status' => 'API is running']);
-});
-
-// Root route - serve a simple message or redirect to frontend
+// Root endpoint - API Server Info
 Route::get('/', function () {
     return response()->json([
         'message' => 'Canteen API Server',
         'version' => '1.0.0',
         'status' => 'operational',
-        'api_docs' => 'Visit /api/ for full API documentation'
+        'frontend' => 'https://canteen-prebooking.netlify.app',
+        'api_base' => '/api',
+        'api_docs' => 'Visit /api/ for endpoints'
     ]);
-});
+})->name('home');
 
-// Catch-all for undefined routes - return a helpful API response
-Route::fallback(function () {
+// Health check endpoint
+Route::get('/health', function () {
+    return response()->json(['status' => 'OK', 'service' => 'Canteen API']);
+})->name('health');
+
+// Catch-all route for unmatched paths
+Route::any('{any?}', function ($any = null) {
     $path = request()->path();
     
-    // If it's an API request that doesn't exist
+    // Block API calls that don't match any routes
     if (str_starts_with($path, 'api/')) {
-        return response()->json(['message' => 'API endpoint not found'], 404);
+        return response()->json([
+            'error' => 'Not Found',
+            'message' => "API endpoint '$path' does not exist"
+        ], 404);
     }
     
-    // For other paths, suggest using the API
+    // For all other non-API paths, show API info
     return response()->json([
-        'error' => 'Route not found',
-        'message' => 'The frontend is served separately. API endpoints are available at /api/'
+        'message' => 'Canteen API Server',
+        'version' => '1.0.0',
+        'status' => 'operational',
+        'frontend' => 'https://canteen-prebooking.netlify.app',
+        'api_base' => '/api',
+        'info' => "The endpoint '/$path' was not found. API endpoints are available at /api/"
     ], 404);
-});
+})->where('any', '.*');
