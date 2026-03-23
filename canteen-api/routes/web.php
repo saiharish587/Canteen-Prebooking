@@ -17,5 +17,10 @@ Route::get('/health', function () {
     return response()->json(['status' => 'API is running']);
 });
 
+// Fallback - catch all undefined web routes
+Route::fallback(function () {
+    return response()->json(['error' => 'Web route not found'], 404);
+});
+
 
 
