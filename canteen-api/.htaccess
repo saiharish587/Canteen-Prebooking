@@ -1,6 +1,6 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /canteen-api/
+    RewriteBase /
     
     # Handle requests to existing files and directories
     RewriteCond %{REQUEST_FILENAME} !-f

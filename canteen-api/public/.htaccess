@@ -4,7 +4,7 @@
     </IfModule>
 
     RewriteEngine On
-    RewriteBase /canteen-api/public/
+    RewriteBase /
     
     # Method 1: Pass Authorization header through to Laravel via RewriteRule
     RewriteCond %{HTTP:Authorization} .
