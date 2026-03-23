@@ -102,9 +102,15 @@ class APIService {
     }
 
     storeUserData(data) {
-        localStorage.setItem('bvrit_current_user', data.username);
-        localStorage.setItem('bvrit_user_id', data.user_id);
-        localStorage.setItem('bvrit_user_type', data.user_type);
+        const username = data.username || data.user_username || data.name || 'User';
+        const userId = data.user_id || data.serialno || data.id;
+        const userType = data.user_type || 'customer';
+        
+        console.log('Storing user data:', { username, userId, userType });
+        
+        localStorage.setItem('bvrit_current_user', username);
+        localStorage.setItem('bvrit_user_id', userId);
+        localStorage.setItem('bvrit_user_type', userType);
     }
 
     scheduleTokenRefresh() {
@@ -134,15 +140,19 @@ class APIService {
             });
 
             const data = await this.handleResponse(response);
+            console.log('Register response:', data);
 
             if (data.data?.access_token) {
                 this.setTokens(data.data.access_token, data.data.refresh_token);
+                console.log('Token set:', data.data.access_token.substring(0, 20) + '...');
                 this.storeUserData(data.data);
+            } else {
+                console.error('❌ No token in register response:', data);
             }
 
             return data;
         } catch (error) {
-            console.error('Register error:', error);
+            console.error('❌ Register error:', error);
             throw error;
         }
     }
@@ -157,16 +167,32 @@ class APIService {
             });
 
             const data = await this.handleResponse(response);
+            
+            console.log('Login response:', data);
 
             if (data.data?.access_token) {
                 this.setTokens(data.data.access_token, data.data.refresh_token);
-                this.storeUserData(data.data);
+                console.log('Token set:', data.data.access_token.substring(0, 20) + '...');
+                
+                // Store user data with all fields
+                if (data.data.username) {
+                    this.storeUserData(data.data);
+                    console.log('User data stored:', {
+                        username: data.data.username,
+                        user_id: data.data.user_id,
+                        type: data.data.user_type
+                    });
+                }
+                
                 this.scheduleTokenRefresh();
+            } else {
+                console.error('❌ No token in response:', data);
+                throw new Error('No access token in response');
             }
 
             return data;
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('❌ Login error:', error);
             throw error;
         }
     }

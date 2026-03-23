@@ -5,16 +5,26 @@ let cartData = null;
 function checkAuthBeforeCheckout(){
     const token = localStorage.getItem('bvrit_access_token');
     const user = localStorage.getItem('bvrit_current_user');
+    const userType = localStorage.getItem('bvrit_user_type');
     
     console.log('Checkout auth check:');
     console.log('Token exists:', !!token);
     console.log('User:', user);
+    console.log('User type:', userType);
     
-    if(!token || !user) {
-        alert('Please login to proceed to checkout.');
-        window.location.href = 'index.html';
+    // Allow if both user and token exist
+    if(user && token) {
         return;
     }
+    
+    // Allow admin offline access
+    if(user && userType === 'admin') {
+        return;
+    }
+    
+    // Auth failed
+    alert('Please login to proceed to checkout.');
+    window.location.href = 'index.html';
 }
 
 // Initialize page

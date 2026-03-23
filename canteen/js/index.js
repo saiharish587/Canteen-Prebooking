@@ -1,6 +1,6 @@
 // Admin credentials (per requirement)
 const ADMIN_EMAIL = 'admin@bvrit.ac.in';
-const ADMIN_PASSWORD = 'admin@123';
+const ADMIN_PASSWORD = 'Admin@123';
 
 // Track login state
 let isLoggedIn = false;
@@ -167,8 +167,16 @@ function handleLogin(e){
     const username = document.getElementById('userUsername').value.trim();
     const pwd = document.getElementById('userPassword').value;
     
+    console.log('🔐 [handleLogin] Username entered:', username);
+    console.log('🔐 [handleLogin] Password length:', pwd ? pwd.length : 0);
+    console.log('🔐 [handleLogin] Admin email constant:', ADMIN_EMAIL);
+    console.log('🔐 [handleLogin] Admin password constant:', ADMIN_PASSWORD);
+    console.log('🔐 [handleLogin] Email match?:', username === ADMIN_EMAIL);
+    console.log('🔐 [handleLogin] Password match?:', pwd === ADMIN_PASSWORD);
+    
     // Check if trying to login as admin first
     if(username === ADMIN_EMAIL && pwd === ADMIN_PASSWORD) {
+        console.log('✅ [ADMIN LOGIN DETECTED] Proceeding with admin login');
         isAdmin = true;
         const s=document.getElementById('loginSuccess');
         s.textContent='🔐 Admin access granted!';
@@ -178,7 +186,16 @@ function handleLogin(e){
         currentUsername = 'admin';
         localStorage.setItem('bvrit_current_user', 'admin');
         localStorage.setItem('bvrit_is_admin', 'true');
-        setTimeout(()=>{ window.location.href = 'admin.html'; },500);
+        // Generate a token for admin offline access (required by order-type.js auth check)
+        localStorage.setItem('bvrit_access_token', 'admin_token_' + Date.now());
+        localStorage.setItem('bvrit_user_type', 'admin');
+        console.log('✅ [ADMIN LOGIN] localStorage set, closing modal...');
+        closeLoginModal();
+        console.log('✅ [ADMIN LOGIN] Modal closed, redirecting to admin.html...');
+        setTimeout(()=>{ 
+            console.log('✅ [REDIRECT] Now redirecting to admin.html');
+            window.location.href = 'admin.html'; 
+        }, 500);
         return;
     }
     
