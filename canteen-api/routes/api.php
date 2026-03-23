@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\AdminController;
 
-// Root route - placed here directly
+// Routes WITHOUT /api prefix
 Route::get('/', function () {
     return response()->json([
         'message' => 'Canteen API Server',
@@ -17,12 +17,11 @@ Route::get('/', function () {
     ]);
 });
 
-// Health check endpoint
 Route::get('/health', function () {
     return response()->json(['status' => 'API is running']);
 });
 
-// API v1 Routes - all under /api prefix
+// Routes WITH /api prefix - all API endpoints
 Route::prefix('api')->group(function () {
     // Public Auth Routes
     Route::prefix('auth')->group(function () {
