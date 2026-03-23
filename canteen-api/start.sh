@@ -4,22 +4,26 @@ set -e
 
 cd /app
 
-echo "Removing lock file for fresh composer resolution..."
+echo "=== STARTING CANTEEN API DEPLOYMENT ==="
+
+echo "Removing composer lock file..."
 rm -f composer.lock
 
-echo "Installing Composer dependencies..."
-composer install --no-dev --no-interaction
+echo "Installing PHP dependencies..."
+composer install --no-dev --no-interaction --optimize-autoloader
 
-echo "Clearing application cache..."
+echo "Clearing all Laravel caches..."
+php artisan optimize:clear 2>/dev/null || true
 php artisan config:clear
-php artisan route:clear
 php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
 
-echo "Running migrations..."
-php artisan migrate --force
+echo "Running database migrations..."
+php artisan migrate --force --quiet
 
-echo "Seeding database with menu items and users..."
-php artisan db:seed --force
+echo "Seeding database..."
+php artisan db:seed --force --quiet
 
-echo "Starting Laravel server..."
+echo "=== STARTING LARAVEL SERVER ==="
 php artisan serve --host=0.0.0.0 --port=8000
