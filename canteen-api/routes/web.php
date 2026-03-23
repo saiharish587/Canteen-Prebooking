@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\AdminController;
 
 // Root route
 Route::get('/', function () {
-    return response()->json(['message' => 'Canteen API Server', 'status' => 'operational']);
+    return response()->json(['message' => 'Canteen API Server WORKING', 'status' => 'operational', 'timestamp' => date('Y-m-d H:i:s')]);
 });
 
 // All API routes under /api prefix
