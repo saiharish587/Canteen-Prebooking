@@ -5,20 +5,17 @@
 
     RewriteEngine On
     RewriteBase /
-    
-    # Method 1: Pass Authorization header through to Laravel via RewriteRule
+
+    # Pass Authorization header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-    
-    # Method 2: Alternative - preserve Authorization header using SetEnvIf
-    SetEnvIf Authorization "(.+)" HTTP_AUTHORIZATION=$1
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirect Trailing Slashes If Not A Folder
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Handle Front Controller...
+    # Handle Front Controller - Send all requests to index.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
