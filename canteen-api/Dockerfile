@@ -26,16 +26,27 @@ RUN echo "memory_limit=2G" > /usr/local/etc/php/conf.d/memory.ini
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy application
-COPY . .
+# Copy backend application
+COPY canteen-api/ .
+
+# Create public directory structure
+RUN mkdir -p public/app
+
+# Copy frontend files to public directory
+COPY canteen/css/ public/css/
+COPY canteen/js/ public/js/
+COPY canteen/images/ public/images/
+COPY canteen/*.html public/
+COPY canteen/_redirects public/
 
 # Copy startup script
-COPY start.sh /start.sh
+COPY canteen-api/start.sh /start.sh
 RUN chmod +x /start.sh
 
 # Create directories and fix permissions
 RUN mkdir -p storage/logs bootstrap/cache && \
-    chmod -R 777 storage bootstrap/cache
+    chmod -R 777 storage bootstrap/cache && \
+    chmod -R 755 public
 
 EXPOSE 8000
 
