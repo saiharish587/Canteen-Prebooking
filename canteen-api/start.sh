@@ -1,8 +1,20 @@
 #!/bin/sh
 
-# This script is used locally. For Render, see Procfile
+set -e
 
 cd /app
+
+echo "Checking if vendor directory exists..."
+if [ ! -d "vendor" ]; then
+    echo "Installing Composer dependencies..."
+    composer install --no-dev --no-interaction --optimize-autoloader
+fi
+
+echo "Running migrations..."
+php artisan migrate --force
+
+echo "Seeding database..."
+php artisan db:seed --force
 
 echo "Clearing caches..."
 php artisan config:clear 2>/dev/null || true
