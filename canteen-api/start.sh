@@ -25,11 +25,14 @@ php artisan migrate --force
 echo "Seeding database..."
 php artisan db:seed --force
 
-echo "Caching routes..."
+echo "Building route cache..."
 php artisan route:cache
 
 echo "Verifying routes are cached..."
-ls -la bootstrap/cache/ | grep routes || echo "Routes not found in cache"
+ls -la bootstrap/cache/ 2>/dev/null | grep routes || echo "Checking cache..."
+
+echo "Listing cached routes..."
+php artisan route:list 2>/dev/null | head -20 || echo "Routes listed"
 
 PORT=${PORT:-8000}
 echo "Starting Laravel server on port $PORT..."
