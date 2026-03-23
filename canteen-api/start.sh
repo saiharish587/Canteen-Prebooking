@@ -10,6 +10,11 @@ rm -f composer.lock
 echo "Installing Composer dependencies..."
 composer install --no-dev --no-interaction
 
+echo "Clearing application cache..."
+php artisan config:clear
+php artisan route:clear
+php artisan cache:clear
+
 echo "Running migrations..."
 php artisan migrate --force
 
