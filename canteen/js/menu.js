@@ -81,10 +81,107 @@ function displayOrderType(){
     }
 }
 
-// Load menu items from admin localStorage
+// Load menu items from API (primary) or admin localStorage (fallback)
+async function loadMenuItemsFromAPI(){
+    const token = localStorage.getItem('bvrit_access_token');
+    const apiUrl = getAPIURL();
+    
+    try {
+        const response = await fetch(`${apiUrl}/menu`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ Loaded menu items from API:', data.items?.length || data.data?.length, 'items');
+        
+        // Return items in expected format
+        return data.items || data.data || [];
+    } catch (error) {
+        console.warn('⚠️  Failed to load from API, trying localStorage fallback:', error.message);
+        
+        // Fallback to admin localStorage
+        const adminItems = JSON.parse(localStorage.getItem('bvrit_menu_items') || 'null');
+        if (adminItems) {
+            console.log('Using', adminItems.length, 'items from localStorage');
+            return adminItems;
+        }
+        
+        console.error('❌ No menu items available from API or localStorage');
+        return [];
+    }
+}
+
+// Initialize menu and load items from API
+async function initializeMenu(){
+    try {
+        const menuItems = await loadMenuItemsFromAPI();
+        
+        if (menuItems.length === 0) {
+            document.getElementById('menuContainer').innerHTML = 
+                '<p style="padding:20px;text-align:center;color:#f44336">Menu items not available. Please try again later.</p>';
+            return;
+        }
+        
+        // Group items by category
+        const grouped = {};
+        menuItems.forEach(item => {
+            const cat = item.category || 'Other';
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(item);
+        });
+        
+        // Render menu
+        let html = '';
+        for (const [category, items] of Object.entries(grouped)) {
+            html += `<div class="menu-category" data-category="${category}">
+                <h3 class="category-title">${category.toUpperCase()}</h3>
+                <div class="items-grid">`;
+            
+            items.forEach(item => {
+                html += `
+                    <div class="menu-item" data-name="${escapeHtml(item.name)}" 
+                         data-item-id="${item.id}" data-price="${item.price}">
+                        <div class="item-image">
+                            ${item.image ? `<img src="${item.image}" alt="${escapeHtml(item.name)}">` : '<div style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:100%;color:#999">🍽️</div>'}
+                        </div>
+                        <div class="item-content">
+                            <h4>${escapeHtml(item.name)}</h4>
+                            <p class="description">${escapeHtml(item.description || '')}</p>
+                            <div class="item-footer">
+                                <span class="price">₹${item.price}</span>
+                                <button class="add-btn" onclick="addToCart(this)">Add +</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+        }
+        
+        document.getElementById('menuContainer').innerHTML = html;
+        
+        // Re-apply admin customizations if any
+        loadMenuItemsFromAdmin();
+    } catch (error) {
+        console.error('Error initializing menu:', error);
+        document.getElementById('menuContainer').innerHTML = 
+            '<p style="padding:20px;text-align:center;color:#f44336">Error loading menu. Please refresh.</p>';
+    }
+}
+
+// Load menu items from admin localStorage (to override prices/availability)
 function loadMenuItemsFromAdmin(){
     const adminItems = JSON.parse(localStorage.getItem('bvrit_menu_items') || 'null');
-    if(!adminItems) return; // Use default items if admin hasn't set any
+    if(!adminItems) return;
 
     // Update prices and availability based on admin changes
     adminItems.forEach(adminItem => {
@@ -459,7 +556,7 @@ function showAdminButton(){
 }
 
 // Initialize
-loadMenuItemsFromAdmin(); // Load any admin changes
+initializeMenu(); // Load menu items from API (primary) or localStorage (fallback)
 loadCartFromAPI(); // Load cart from API
 showAdminButton(); // Show admin button if admin is viewing
 
