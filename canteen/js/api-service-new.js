@@ -1,7 +1,10 @@
 /**
- * API Service Layer
- * Handles all API communication with backend
- * BVRIT Canteen Frontend
+ * API Service Layer - Unified API Interface
+ * Handles all API communication with Render backend
+ * BVRIT Canteen Frontend - Standardized Service
+ * 
+ * This is the PRIMARY API service for all frontend communication.
+ * Consolidates auth, menu, cart, order, and admin endpoints.
  */
 
 // Get API URL based on environment
@@ -15,6 +18,22 @@ function getAPIURL() {
 }
 
 const API_URL = getAPIURL();
+
+// Utility function to check if token is valid
+function isTokenValid() {
+    const token = localStorage.getItem('bvrit_access_token');
+    return token && token.length > 0;
+}
+
+// Utility function to clear all auth data
+function clearAllAuthData() {
+    localStorage.removeItem('bvrit_access_token');
+    localStorage.removeItem('bvrit_refresh_token');
+    localStorage.removeItem('bvrit_current_user');
+    localStorage.removeItem('bvrit_user_id');
+    localStorage.removeItem('bvrit_user_type');
+    localStorage.removeItem('bvrit_is_admin');
+}
 
 class APIService {
     constructor() {
