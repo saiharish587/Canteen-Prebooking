@@ -40,7 +40,7 @@ class MenuController
 
             return response()->json([
                 'success' => true,
-                'items' => $items
+                'data' => $items
             ]);
         } catch (\Exception $e) {
             return response()->json([
