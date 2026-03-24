@@ -223,6 +223,8 @@ async function loginViaAPI(username, pwd) {
     try {
         let email = username;
         console.log('🔐 [LOGIN START] Username/Email:', username);
+        console.log('🔐 [LOGIN START] Password length:', pwd ? pwd.length : 0);
+        console.log('🔐 [LOGIN START] Password value:', pwd);
         
         // Get correct API URL
         const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
@@ -237,6 +239,7 @@ async function loginViaAPI(username, pwd) {
             try {
                 const getEmailUrl = `${apiUrl}/auth/get-email`;
                 console.log('🔐 [GET-EMAIL] Calling:', getEmailUrl);
+                console.log('🔐 [GET-EMAIL] Posting username:', username);
                 
                 const response = await fetch(getEmailUrl, {
                     method: 'POST',
@@ -255,7 +258,7 @@ async function loginViaAPI(username, pwd) {
                 
                 if (!data.success) {
                     console.error('❌ [GET-EMAIL FAILED]', data.message);
-                    document.getElementById('usernameError').textContent = data.message || 'Username not found';
+                    document.getElementById('usernameError').textContent = data.message || 'Username not found - "' + username + '" does not exist';
                     document.getElementById('usernameError').classList.add('show');
                     document.getElementById('userUsername').classList.add('error');
                     return;
@@ -687,7 +690,39 @@ function updateCanteenStatus() {
     }
 }
 
+// Check if user is already logged in from localStorage
+function restoreLoginState() {
+    const token = localStorage.getItem('bvrit_access_token');
+    const username = localStorage.getItem('bvrit_current_user');
+    const userType = localStorage.getItem('bvrit_user_type');
+    
+    if (token && username) {
+        console.log('✅ [RESTORE LOGIN] Found token in localStorage');
+        console.log('   Username:', username);
+        console.log('   User Type:', userType);
+        
+        isLoggedIn = true;
+        currentUsername = username;
+        
+        if (userType === 'admin') {
+            isAdmin = true;
+            localStorage.setItem('bvrit_is_admin', 'true');
+        }
+        
+        // Re-enable cart and order buttons
+        enableCartAndButtons();
+        
+        console.log('✅ [RESTORE LOGIN] State restored successfully');
+        console.log('   isLoggedIn:', isLoggedIn);
+        console.log('   currentUsername:', currentUsername);
+    } else {
+        console.log('ℹ️ [NO LOGIN STATE] No token found - user not logged in');
+        isLoggedIn = false;
+    }
+}
+
 // init
+restoreLoginState();
 updateCartUI();
 loadDailySpecials();
 updateCanteenStatus();
