@@ -172,10 +172,11 @@ function handleLogin(e){
     console.log('🔐 [handleLogin] Admin email constant:', ADMIN_EMAIL);
     console.log('🔐 [handleLogin] Admin password constant:', ADMIN_PASSWORD);
     console.log('🔐 [handleLogin] Email match?:', username === ADMIN_EMAIL);
+    console.log('🔐 [handleLogin] Username match?:', username === 'admin');
     console.log('🔐 [handleLogin] Password match?:', pwd === ADMIN_PASSWORD);
     
-    // Check if trying to login as admin first
-    if(username === ADMIN_EMAIL && pwd === ADMIN_PASSWORD) {
+    // Check if trying to login as admin first (check both email and username 'admin')
+    if((username === ADMIN_EMAIL || username === 'admin') && pwd === ADMIN_PASSWORD) {
         console.log('✅ [ADMIN LOGIN DETECTED] Proceeding with admin login');
         isAdmin = true;
         const s=document.getElementById('loginSuccess');
