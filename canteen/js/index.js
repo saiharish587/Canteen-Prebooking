@@ -480,6 +480,11 @@ async function registerViaAPI(username, email, password) {
             ? 'http://localhost/canteen-api/api' 
             : 'https://canteen-prebooking.onrender.com/api';
         
+        console.log('📝 [SIGNUP START] Sending to:', apiUrl + '/auth/register');
+        console.log('📝 [SIGNUP] Username:', username);
+        console.log('📝 [SIGNUP] Email:', email);
+        console.log('📝 [SIGNUP] Password length:', password.length);
+        
         const response = await fetch(`${apiUrl}/auth/register`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -491,11 +496,20 @@ async function registerViaAPI(username, email, password) {
         });
         
         const data = await response.json();
-        console.log('API Response Status:', response.status);
-        console.log('API Response Data:', data);
-        console.log('API Response Errors:', data.errors);
+        console.log('📝 [SIGNUP RESPONSE]', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+            success: data.success,
+            message: data.message,
+            hasData: !!data.data,
+            hasToken: data.data && !!data.data.access_token,
+            errors: data.errors
+        });
+        console.log('📝 [SIGNUP FULL DATA]:', data);
         
         if (response.ok && data.success) {
+            console.log('✅ [SIGNUP SUCCESS] Registration successful');
             // Registration successful
             if (data.data && data.data.access_token) {
                 localStorage.setItem('bvrit_access_token', data.data.access_token);
@@ -517,14 +531,13 @@ async function registerViaAPI(username, email, password) {
                 modal.style.display = 'none';
             }
             
-            console.log('Registration successful');
-            alert('Signup successful!');
+            alert('✅ Signup successful! Redirecting...');
             
             // Determine redirect based on user type
             let redirectUrl = 'order-type.html?auth=1&t=' + Date.now();
             if (data.data && data.data.user_type === 'admin') {
                 redirectUrl = 'admin.html';
-                console.log('Admin registration - redirecting to admin panel');
+                console.log('✅ [SIGNUP] Admin registration - redirecting to admin panel');
             }
             
             // Longer delay to ensure localStorage is persisted
@@ -533,20 +546,35 @@ async function registerViaAPI(username, email, password) {
                 console.log('✅ [SIGNUP] Token in storage:', !!localStorage.getItem('bvrit_access_token'));
                 window.location.href = redirectUrl;
             }, 1000);
+        } else if (!response.ok) {
+            console.error('❌ [SIGNUP] HTTP Error:', response.status, response.statusText);
+            console.error('❌ [SIGNUP] Response body:', data);
+            let errorMsg = `Server Error (${response.status}): `;
+            if (data.message) {
+                errorMsg += data.message;
+            } else if (data.errors) {
+                let errors = [];
+                for (let field in data.errors) {
+                    errors.push(`${field}: ${data.errors[field].join(', ')}`);
+                }
+                errorMsg += errors.join('\n');
+            } else {
+                errorMsg += 'Unknown error. Check console for details.';
+            }
+            alert(errorMsg);
         } else if (data.errors) {
-            let errorMsg = 'Signup failed:\n';
+            console.error('❌ [SIGNUP] Validation errors:', data.errors);
+            let errorMsg = 'Validation failed:\n';
             for (let field in data.errors) {
                 errorMsg += `${field}: ${data.errors[field].join(', ')}\n`;
             }
-            console.error('❌ [SIGNUP] Validation errors:', errorMsg);
             alert(errorMsg);
         } else if (data.message) {
             console.error('❌ [SIGNUP] Error message:', data.message);
             alert('Error: ' + data.message);
         } else {
-            console.error('❌ [SIGNUP] Unknown error - response:', response.status, data);
-            alert('Signup failed. Status: ' + response.status);
-        }
+            console.error('❌ [SIGNUP] Unexpected response:', data);
+            alert('Signup failed. Check console for details.');
     } catch (error) {
         console.error('❌ [SIGNUP NETWORK ERROR]', error);
         alert('Connection error: ' + error.message + '. Make sure the backend is running at ' + 
