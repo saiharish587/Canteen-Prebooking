@@ -575,6 +575,7 @@ async function registerViaAPI(username, email, password) {
         } else {
             console.error('❌ [SIGNUP] Unexpected response:', data);
             alert('Signup failed. Check console for details.');
+        }
     } catch (error) {
         console.error('❌ [SIGNUP NETWORK ERROR]', error);
         alert('Connection error: ' + error.message + '. Make sure the backend is running at ' + 
