@@ -9,6 +9,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function ($middleware) {
+        // Exclude API routes from CSRF protection (API uses JWT/Bearer tokens, not CSRF)
+        $middleware->validateCsrfTokens(except: [
+            'api/*',  // Exclude all /api routes from CSRF verification
+        ]);
+        
         // Register custom middleware aliases
         $middleware->alias([
             'validate.session.token' => \App\Http\Middleware\ValidateSessionToken::class,
