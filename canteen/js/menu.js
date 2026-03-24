@@ -9,12 +9,12 @@ setTimeout(function() {
     const urlParams = new URLSearchParams(window.location.search);
     const isFromLogin = urlParams.get('auth') === '1';
 
-    console.log('menu.js - Auth check:');
-    console.log('currentUser:', currentUser);
-    console.log('accessToken exists?:', !!accessToken);
-    console.log('userType:', userType);
-    console.log('isAdmin:', isAdmin);
-    console.log('fromLogin URL param?:', isFromLogin);
+    console.log('✅ menu.js - Auth check after 1000ms delay:');
+    console.log('  currentUser:', currentUser);
+    console.log('  accessToken exists?:', !!accessToken);
+    console.log('  userType:', userType);
+    console.log('  isAdmin:', isAdmin);
+    console.log('  fromLogin URL param?:', isFromLogin);
 
     // If coming from login, allow access
     if(isFromLogin) {
@@ -38,15 +38,15 @@ setTimeout(function() {
         initUserGreeting();
         document.body.style.opacity = '1';
     } else {
-        console.error('Auth check FAILED');
+        console.error('❌ Auth check FAILED - redirecting to login');
         localStorage.removeItem('bvrit_current_user');
         localStorage.removeItem('bvrit_access_token');
         localStorage.removeItem('bvrit_user_type');
         localStorage.removeItem('bvrit_is_admin');
-        alert('Please login to access the menu.');
+        alert('Session expired. Please login again.');
         window.location.href = 'index.html';
     }
-}, 500);
+}, 1000);
 
 // Initialize user greeting
 function initUserGreeting(){

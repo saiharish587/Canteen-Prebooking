@@ -57,8 +57,8 @@ function checkAuthAndInit() {
     window.location.href = 'index.html';
 }
 
-// Call with longer delay (500ms) to ensure localStorage is synced after redirect
-setTimeout(checkAuthAndInit, 500);
+// Call with longer delay (1000ms) to ensure localStorage is synced after redirect
+setTimeout(checkAuthAndInit, 1000);
 
 // Initialize greeting
 function initGreeting(){

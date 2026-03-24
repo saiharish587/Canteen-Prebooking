@@ -507,32 +507,36 @@ async function registerViaAPI(username, email, password) {
             alert('Signup successful!');
             
             // Determine redirect based on user type
-            let redirectUrl = 'order-type.html';
+            let redirectUrl = 'order-type.html?auth=1&t=' + Date.now();
             if (data.data && data.data.user_type === 'admin') {
                 redirectUrl = 'admin.html';
                 console.log('Admin registration - redirecting to admin panel');
             }
             
+            // Longer delay to ensure localStorage is persisted
             setTimeout(() => {
+                console.log('✅ [SIGNUP] Redirecting to:', redirectUrl);
+                console.log('✅ [SIGNUP] Token in storage:', !!localStorage.getItem('bvrit_access_token'));
                 window.location.href = redirectUrl;
-            }, 500);
-        } else if (!response.ok && data.errors) {
+            }, 1000);
+        } else if (data.errors) {
             let errorMsg = 'Signup failed:\n';
             for (let field in data.errors) {
                 errorMsg += `${field}: ${data.errors[field].join(', ')}\n`;
             }
-            console.log('Showing error:', errorMsg);
+            console.error('❌ [SIGNUP] Validation errors:', errorMsg);
             alert(errorMsg);
-        } else if (!response.ok && data.message) {
-            console.log('Showing message:', data.message);
+        } else if (data.message) {
+            console.error('❌ [SIGNUP] Error message:', data.message);
             alert('Error: ' + data.message);
         } else {
-            console.log('Unknown error');
-            alert('Signup failed. Please try again.');
+            console.error('❌ [SIGNUP] Unknown error - response:', response.status, data);
+            alert('Signup failed. Status: ' + response.status);
         }
     } catch (error) {
-        console.error('Registration error:', error);
-        alert('Connection error. Please try again.');
+        console.error('❌ [SIGNUP NETWORK ERROR]', error);
+        alert('Connection error: ' + error.message + '. Make sure the backend is running at ' + 
+              (window.location.hostname === 'localhost' ? 'http://localhost/canteen-api/api' : 'https://canteen-prebooking.onrender.com/api'));
     }
 }
 
