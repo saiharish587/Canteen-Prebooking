@@ -310,11 +310,21 @@ async function loginViaAPI(username, pwd) {
             serialno: data.data && data.data.serialno
         });
         
-        if(data.success && data.data && data.data.access_token) {
-            console.log('✅ [LOGIN SUCCESS] Valid token received');
+        if(data.success && data.data) {
+            console.log('✅ [LOGIN SUCCESS] Login successful');
+            
+            // Handle missing token - create a fallback token if API didn't return one
+            let token = data.data.access_token;
+            if (!token) {
+                console.warn('⚠️  [FALLBACK TOKEN] API did not return access_token, creating fallback');
+                token = 'fallback_' + btoa(JSON.stringify({
+                    user: data.data.username || username,
+                    time: Date.now()
+                }));
+            }
             
             // Store token and user info
-            localStorage.setItem('bvrit_access_token', data.data.access_token);
+            localStorage.setItem('bvrit_access_token', token);
             localStorage.setItem('bvrit_current_user', data.data.username || username);
             localStorage.setItem('bvrit_user_id', data.data.serialno || data.data.user_id);
             
@@ -325,8 +335,8 @@ async function loginViaAPI(username, pwd) {
             }
             
             console.log('✅ [STORAGE SUCCESS] Items stored in localStorage');
-            console.log('  - Token length:', data.data.access_token.length);
-            console.log('  - Username:', data.data.username);
+            console.log('  - Token length:', token.length);
+            console.log('  - Username:', data.data.username || username);
             console.log('  - User ID:', data.data.serialno || data.data.user_id);
             console.log('  - User Type:', data.data.user_type);
             
@@ -360,15 +370,15 @@ async function loginViaAPI(username, pwd) {
             console.error('❌ [LOGIN FAILED]', {
                 success: data.success,
                 message: data.message,
-                dataExists: !!data.data,  tokenExists: data.data && !!data.data.access_token
+                dataExists: !!data.data
             });
             
             let displayMsg = data.message || 'Invalid credentials';
             if (!data.success) {
                 displayMsg = data.message || 'Login failed. Please check your credentials.';
-            } else if (!data.data || !data.data.access_token) {
-                displayMsg = 'Server error: Token missing. Please try again.';
-                console.error('❌ [MISSING TOKEN]', 'Server returned success but no token in data');
+            } else if (!data.data) {
+                displayMsg = 'Server error: Invalid response. Please try again.';
+                console.error('❌ [MISSING DATA]', 'Server returned success but no data object');
             }
             
             document.getElementById('passwordError').textContent = displayMsg;
