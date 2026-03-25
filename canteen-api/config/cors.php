@@ -38,6 +38,10 @@ return [
     'allowed_origins_patterns' => [
         '/^http:\/\/localhost(:\d+)?$/',
         '/^http:\/\/127\.0\.0\.1(:\d+)?$/',
+        // Allow all Vercel preview and production domains for this project
+        '/^https:\/\/.*-bvritns\.vercel\.app$/',
+        // Allow specific production domain
+        '/^https:\/\/manjunath-2043980-canteenprebooking\.(vercel\.app|example\.com)$/',
     ],
 
     'allowed_headers' => ['*'],
