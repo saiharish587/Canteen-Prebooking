@@ -9,9 +9,9 @@
 
 // Get API URL based on environment
 function getAPIURL() {
-    // Development: Use localhost
+    // Development: Use PHP built-in server on port 8000
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost/canteen-api/api';
+        return 'http://localhost:8000/api';
     }
     // Production: Use Render backend
     return 'https://canteen-prebooking.onrender.com/api';
