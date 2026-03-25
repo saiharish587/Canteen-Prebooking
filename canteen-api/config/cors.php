@@ -29,6 +29,7 @@ return [
         // Production environments
         'https://canteen-prebooking.onrender.com',
         'https://manjunath-2043980-canteenprebooking.vercel.app',
+        'https://manjunath-2043980-canteenprebooking-obikre6fz-bvritns.vercel.app',
         'https://canteen.example.com', // Update with your production domain
         
         // Add more origins as needed
