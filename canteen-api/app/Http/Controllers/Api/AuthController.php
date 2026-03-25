@@ -44,16 +44,20 @@ class AuthController
 
             \Log::info('User created successfully', ['username' => $user->username, 'serialno' => $user->serialno]);
 
-            // Send registration notification email
-            try {
-                Mail::to($user->email)->send(new RegistrationNotification(
-                    $user->username,
-                    $user->email,
-                    $user->user_type
-                ));
-                \Log::info('Registration email sent', ['email' => $user->email]);
-            } catch (\Exception $mailError) {
-                \Log::error('Failed to send registration email', ['error' => $mailError->getMessage()]);
+            // Send registration notification email (skip in development for now)
+            if (config('app.env') === 'production') {
+                try {
+                    Mail::to($user->email)->send(new RegistrationNotification(
+                        $user->username,
+                        $user->email,
+                        $user->user_type
+                    ));
+                    \Log::info('Registration email sent', ['email' => $user->email]);
+                } catch (\Exception $mailError) {
+                    \Log::error('Failed to send registration email', ['error' => $mailError->getMessage()]);
+                }
+            } else {
+                \Log::info('Email sending skipped in development', ['email' => $user->email]);
             }
 
             // Create a simple session token
@@ -132,15 +136,19 @@ class AuthController
             $hash = hash('sha256', $tokenData . config('app.key'));
             $token = 'session_' . $hash . '.' . $tokenData;
 
-            // Send login notification email
-            try {
-                Mail::to($user->email)->send(new LoginNotification(
-                    $user->username,
-                    $user->email
-                ));
-                \Log::info('Login email sent', ['email' => $user->email]);
-            } catch (\Exception $mailError) {
-                \Log::error('Failed to send login email', ['error' => $mailError->getMessage()]);
+            // Send login notification email (skip in development for now)
+            if (config('app.env') === 'production') {
+                try {
+                    Mail::to($user->email)->send(new LoginNotification(
+                        $user->username,
+                        $user->email
+                    ));
+                    \Log::info('Login email sent', ['email' => $user->email]);
+                } catch (\Exception $mailError) {
+                    \Log::error('Failed to send login email', ['error' => $mailError->getMessage()]);
+                }
+            } else {
+                \Log::info('Email sending skipped in development', ['email' => $user->email]);
             }
 
             return response()->json([
