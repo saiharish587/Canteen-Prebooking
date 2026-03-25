@@ -19,16 +19,13 @@ class CartController
                 ['user_id' => $user->serialno ?? $user->id]
             );
 
-            if (!$cart->isEmpty()) {
-                $cart->recalculateTotal();
-            }
-
-            // Calculate subtotal and tax from items
+            // Calculate subtotal and tax from items using loaded collection
             $subtotal = $cart->items->sum(function($item) {
-                return $item->price * $item->quantity;
+                return (float) $item->price * $item->quantity;
             });
             $taxAmount = $subtotal * 0.09;
             $total = $subtotal + $taxAmount;
+            $itemCount = $cart->items->sum('quantity');
 
             return response()->json([
                 'success' => true,
@@ -47,7 +44,7 @@ class CartController
                     'subtotal' => (float) $subtotal,
                     'tax_amount' => (float) $taxAmount,
                     'total' => (float) $total,
-                    'item_count' => $cart->getItemCount(),
+                    'item_count' => $itemCount,
                 ]
             ]);
         } catch (\Exception $e) {
